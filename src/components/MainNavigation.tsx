@@ -12,7 +12,11 @@ const MainNavigation: React.FC = () => {
       <div className="grid grid-cols-3 gap-4">
         <NavItem icon={<MessageSquare className="h-6 w-6" />} label="Forum" />
         <NavItem icon={<Megaphone className="h-6 w-6" />} label="Pengumuman" />
-        <NavItem icon={<FilePen className="h-6 w-6" />} label="Pengaduan" />
+        <NavItem 
+          icon={<FilePen className="h-6 w-6" />} 
+          label="Pengaduan" 
+          onClick={() => navigate('/pengaduan')}
+        />
         <NavItem 
           icon={<Bot className="h-6 w-6" />} 
           label="Konsultasi" 
