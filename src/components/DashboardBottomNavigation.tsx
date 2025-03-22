@@ -49,21 +49,10 @@ const DashboardBottomNavigation: React.FC = () => {
           </NavigationMenuItem>
           
           <NavigationMenuItem>
-            <DropdownMenu>
-              <DropdownMenuTrigger className="flex flex-col items-center focus:outline-none">
-                <User className={`h-5 w-5 ${isActive('/profile')}`} />
-                <span className="text-xs mt-1">Profil</span>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem>
-                  Pengaturan Profil
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <SignOutButton variant="ghost" showIcon={true} className="w-full justify-start p-0 h-auto font-normal" />
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <NavLink to="/profile" className={`flex flex-col items-center ${isActive('/profile')}`}>
+              <User className="h-5 w-5" />
+              <span className="text-xs mt-1">Profil</span>
+            </NavLink>
           </NavigationMenuItem>
         </NavigationMenuList>
       </NavigationMenu>

@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Bell, Settings } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -16,7 +17,7 @@ const DashboardHeader: React.FC = () => {
   
   return (
     <header className="bg-white px-4 py-3 flex justify-between items-center shadow-sm">
-      <div className="flex items-center space-x-3">
+      <Link to="/profile" className="flex items-center space-x-3">
         <div className="w-10 h-10 rounded-full bg-gray-300 overflow-hidden">
           <img 
             src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-1.jpg" 
@@ -28,7 +29,7 @@ const DashboardHeader: React.FC = () => {
           <h2 className="text-sm font-semibold">{user?.email?.split('@')[0] || 'Pengguna'}</h2>
           <span className="text-xs text-teal">Anggota Aktif</span>
         </div>
-      </div>
+      </Link>
       <div className="flex items-center space-x-4">
         <button className="text-gray-600 relative">
           <Bell className="h-5 w-5" />
@@ -39,9 +40,11 @@ const DashboardHeader: React.FC = () => {
             <Settings className="h-5 w-5 text-gray-600" />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem>
-              Pengaturan Profil
-            </DropdownMenuItem>
+            <Link to="/profile">
+              <DropdownMenuItem>
+                Pengaturan Profil
+              </DropdownMenuItem>
+            </Link>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
               <SignOutButton variant="ghost" showIcon={true} className="w-full justify-start p-0 h-auto font-normal" />
