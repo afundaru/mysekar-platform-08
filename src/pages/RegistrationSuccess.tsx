@@ -26,7 +26,8 @@ const RegistrationSuccess: React.FC = () => {
         </div>
         
         <h1 className="text-2xl font-bold mb-4">Pendaftaran Berhasil</h1>
-        <p className="text-gray-600 mb-8">Silahkan verifikasi email Anda untuk melanjutkan</p>
+        <p className="text-gray-600 mb-4">Silahkan verifikasi email @bankraya.co.id Anda untuk melanjutkan</p>
+        <p className="text-gray-500 mb-8 text-sm">Kami telah mengirimkan email verifikasi ke alamat email yang Anda daftarkan</p>
         
         <Button 
           onClick={handleGoToDashboard}

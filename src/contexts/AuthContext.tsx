@@ -2,12 +2,14 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface AuthContextType {
   session: Session | null;
   user: User | null;
   loading: boolean;
   signOut: () => Promise<void>;
+  isValidEmail: (email: string) => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -41,11 +43,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await supabase.auth.signOut();
   };
 
+  // Function to validate email domain
+  const isValidEmail = (email: string): boolean => {
+    return email.endsWith('@bankraya.co.id');
+  };
+
   const value = {
     session,
     user,
     loading,
-    signOut
+    signOut,
+    isValidEmail
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

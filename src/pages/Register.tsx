@@ -8,9 +8,11 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Register: React.FC = () => {
   const navigate = useNavigate();
+  const { isValidEmail } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [agreed, setAgreed] = useState(false);
@@ -33,7 +35,7 @@ const Register: React.FC = () => {
     if (!fullName) newErrors.fullName = 'Nama lengkap harus diisi';
     if (!pnNumber) newErrors.pnNumber = 'Nomor PN harus diisi';
     if (!email) newErrors.email = 'Email harus diisi';
-    else if (!email.endsWith('@bankraya.co.id')) newErrors.email = 'Email harus menggunakan domain @bankraya.co.id';
+    else if (!isValidEmail(email)) newErrors.email = 'Email harus menggunakan domain @bankraya.co.id';
     if (!phone) newErrors.phone = 'Nomor HP harus diisi';
     if (!password) newErrors.password = 'Password harus diisi';
     else if (password.length < 8) newErrors.password = 'Password minimal 8 karakter';
@@ -48,6 +50,16 @@ const Register: React.FC = () => {
     e.preventDefault();
     
     if (!validateForm()) return;
+    
+    // Double check email domain
+    if (!isValidEmail(email)) {
+      setErrors(prev => ({
+        ...prev,
+        email: 'Email harus menggunakan domain @bankraya.co.id'
+      }));
+      toast.error('Email harus menggunakan domain @bankraya.co.id');
+      return;
+    }
     
     setLoading(true);
     
@@ -67,12 +79,35 @@ const Register: React.FC = () => {
       if (error) throw error;
       
       toast.success('Pendaftaran berhasil!');
-      navigate('/otp-verification');
+      navigate('/registration-success');
     } catch (error: any) {
       console.error('Error during registration:', error);
       toast.error(error.message || 'Terjadi kesalahan saat mendaftar');
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Handle email input change with real-time validation
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setEmail(value);
+    
+    // Clear the error when typing
+    if (errors.email) {
+      setErrors(prev => {
+        const updated = { ...prev };
+        delete updated.email;
+        return updated;
+      });
+    }
+    
+    // Add validation error if email doesn't end with @bankraya.co.id
+    if (value && !isValidEmail(value)) {
+      setErrors(prev => ({
+        ...prev,
+        email: 'Email harus menggunakan domain @bankraya.co.id'
+      }));
     }
   };
 
@@ -123,7 +158,7 @@ const Register: React.FC = () => {
               placeholder="Masukkan email @bankraya.co.id" 
               className="w-full px-4 py-3 rounded-lg"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={handleEmailChange}
             />
             {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
           </div>

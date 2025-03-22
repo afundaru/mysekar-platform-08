@@ -7,9 +7,11 @@ import { Eye, EyeOff, Mail } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
+  const { isValidEmail } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -32,16 +34,49 @@ const Login: React.FC = () => {
     const newErrors: Record<string, string> = {};
     
     if (!email) newErrors.email = 'Email harus diisi';
+    else if (!isValidEmail(email)) newErrors.email = 'Email harus menggunakan domain @bankraya.co.id';
     if (!password) newErrors.password = 'Password harus diisi';
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setEmail(value);
+    
+    // Clear the error when typing
+    if (errors.email) {
+      setErrors(prev => {
+        const updated = { ...prev };
+        delete updated.email;
+        return updated;
+      });
+    }
+    
+    // Add validation error if email doesn't end with @bankraya.co.id
+    if (value && !isValidEmail(value)) {
+      setErrors(prev => ({
+        ...prev,
+        email: 'Email harus menggunakan domain @bankraya.co.id'
+      }));
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!validateForm()) return;
+    
+    // Double check email domain
+    if (!isValidEmail(email)) {
+      setErrors(prev => ({
+        ...prev,
+        email: 'Email harus menggunakan domain @bankraya.co.id'
+      }));
+      toast.error('Email harus menggunakan domain @bankraya.co.id');
+      return;
+    }
     
     setLoading(true);
     
@@ -83,7 +118,7 @@ const Login: React.FC = () => {
                 id="email"
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={handleEmailChange}
                 placeholder="Masukkan email @bankraya.co.id"
                 className="w-full px-4 py-3 rounded-lg border border-gray-200"
               />
