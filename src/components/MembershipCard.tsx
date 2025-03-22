@@ -16,9 +16,9 @@ const MembershipCard: React.FC = () => {
             <p className="text-sm opacity-90">Serikat Pekerja Bank Raya</p>
           </div>
           <img 
-            src="https://storage.googleapis.com/uxpilot-auth.appspot.com/43b1de23a9-bank-logo.png" 
+            src="/lovable-uploads/893cf75c-75df-49e4-b588-9adbfecfcd45.png" 
             alt="Bank Raya Logo" 
-            className="h-10 w-auto"
+            className="h-12 w-auto"
           />
         </div>
         
