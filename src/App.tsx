@@ -10,6 +10,7 @@ import Register from "./pages/Register";
 import OtpVerification from "./pages/OtpVerification";
 import RegistrationSuccess from "./pages/RegistrationSuccess";
 import Dashboard from "./pages/Dashboard";
+import KonsultasiHukum from "./pages/KonsultasiHukum";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,6 +28,7 @@ const App = () => (
           <Route path="/otp-verification" element={<OtpVerification />} />
           <Route path="/registration-success" element={<RegistrationSuccess />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/konsultasi-hukum" element={<KonsultasiHukum />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
