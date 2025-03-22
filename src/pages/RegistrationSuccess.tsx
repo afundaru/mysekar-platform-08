@@ -8,7 +8,7 @@ const RegistrationSuccess: React.FC = () => {
   const navigate = useNavigate();
 
   const handleGoToDashboard = () => {
-    navigate('/');
+    navigate('/dashboard');
   };
 
   return (
