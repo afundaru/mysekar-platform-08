@@ -68,7 +68,7 @@ const UserProfile: React.FC = () => {
           <div>
             <div className="flex items-center text-sm text-gray-500 mb-1">
               <UserRound className="h-4 w-4 mr-2" />
-              <Label>Nomor Pegawai</Label>
+              <Label>PN Bank Raya</Label>
             </div>
             <p className="font-medium">{memberData?.pn_number || '-'}</p>
           </div>

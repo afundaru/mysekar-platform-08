@@ -95,14 +95,14 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ onCancel }) => {
             <div className="space-y-2">
               <Label htmlFor="pn_number" className="flex items-center text-sm text-gray-500">
                 <UserIcon className="h-4 w-4 mr-2" />
-                Nomor Pegawai
+                PN Bank Raya
               </Label>
               <Input
                 id="pn_number"
                 name="pn_number"
                 value={formData.pn_number}
                 onChange={handleChange}
-                placeholder="Nomor Pegawai"
+                placeholder="PN Bank Raya"
               />
             </div>
             
