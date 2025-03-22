@@ -9,6 +9,115 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      complaint_attachments: {
+        Row: {
+          complaint_id: string
+          created_at: string
+          file_name: string
+          file_path: string
+          file_size: number
+          file_type: string
+          id: string
+        }
+        Insert: {
+          complaint_id: string
+          created_at?: string
+          file_name: string
+          file_path: string
+          file_size: number
+          file_type: string
+          id?: string
+        }
+        Update: {
+          complaint_id?: string
+          created_at?: string
+          file_name?: string
+          file_path?: string
+          file_size?: number
+          file_type?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "complaint_attachments_complaint_id_fkey"
+            columns: ["complaint_id"]
+            isOneToOne: false
+            referencedRelation: "complaints"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      complaint_updates: {
+        Row: {
+          comment: string | null
+          complaint_id: string
+          created_at: string
+          created_by: string
+          id: string
+          status: string
+        }
+        Insert: {
+          comment?: string | null
+          complaint_id: string
+          created_at?: string
+          created_by: string
+          id?: string
+          status: string
+        }
+        Update: {
+          comment?: string | null
+          complaint_id?: string
+          created_at?: string
+          created_by?: string
+          id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "complaint_updates_complaint_id_fkey"
+            columns: ["complaint_id"]
+            isOneToOne: false
+            referencedRelation: "complaints"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      complaints: {
+        Row: {
+          category: string
+          created_at: string
+          description: string
+          id: string
+          is_anonymous: boolean
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description: string
+          id?: string
+          is_anonymous?: boolean
+          status?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string
+          id?: string
+          is_anonymous?: boolean
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       forum_comments: {
         Row: {
           content: string

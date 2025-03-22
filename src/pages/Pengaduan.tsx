@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Bell, Plus, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,32 +9,63 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import PengaduanBottomNavigation from '../components/pengaduan/PengaduanBottomNavigation';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { Loader2 } from 'lucide-react';
 
 const categories = ["Upah", "PHK", "Pelecehan", "Kondisi Kerja", "Lainnya"];
 
-const reports = [
-  {
-    id: 1,
-    title: "Gaji belum dibayarkan selama 2 bulan",
-    category: "Upah",
-    status: "Pending",
-    date: "2025-03-20",
-  },
-  {
-    id: 2,
-    title: "PHK sepihak tanpa pesangon",
-    category: "PHK",
-    status: "Dalam Tinjauan",
-    date: "2025-03-18",
-  },
-];
+interface Complaint {
+  id: string;
+  title: string;
+  category: string;
+  status: string;
+  created_at: string;
+}
 
 const Pengaduan: React.FC = () => {
+  const { user } = useAuth();
+  const { toast } = useToast();
   const [selectedCategory, setSelectedCategory] = useState<string>(categories[0]);
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [file, setFile] = useState<File | null>(null);
   const [isAnonymous, setIsAnonymous] = useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [complaints, setComplaints] = useState<Complaint[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    fetchComplaints();
+  }, [user]);
+
+  const fetchComplaints = async () => {
+    if (!user) return;
+
+    try {
+      setIsLoading(true);
+      const { data, error } = await supabase
+        .from('complaints')
+        .select('id, title, category, status, created_at')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching complaints:', error);
+        toast({
+          title: "Error",
+          description: "Gagal memuat data pengaduan",
+          variant: "destructive"
+        });
+      } else {
+        setComplaints(data || []);
+      }
+    } catch (error) {
+      console.error('Error in fetchComplaints:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -42,19 +73,108 @@ const Pengaduan: React.FC = () => {
     }
   };
 
-  const handleSubmit = () => {
-    console.log({
-      category: selectedCategory,
-      title,
-      description,
-      file,
-      isAnonymous
-    });
-    // Reset form after submission
-    setTitle("");
-    setDescription("");
-    setFile(null);
-    setIsAnonymous(false);
+  const handleSubmit = async () => {
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "Anda harus login terlebih dahulu",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!title || !description) {
+      toast({
+        title: "Error",
+        description: "Judul dan deskripsi pengaduan wajib diisi",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+    
+    try {
+      // Insert complaint record
+      const { data: complaintData, error: complaintError } = await supabase
+        .from('complaints')
+        .insert({
+          user_id: user.id,
+          title,
+          description,
+          category: selectedCategory,
+          is_anonymous: isAnonymous,
+        })
+        .select('id')
+        .single();
+
+      if (complaintError) {
+        throw complaintError;
+      }
+
+      // Upload file if provided
+      if (file && complaintData?.id) {
+        const fileExt = file.name.split('.').pop();
+        const filePath = `${user.id}/${complaintData.id}/${Math.random().toString(36).substring(2)}.${fileExt}`;
+        
+        const { error: uploadError } = await supabase.storage
+          .from('complaint_attachments')
+          .upload(filePath, file);
+
+        if (uploadError) {
+          console.error('Error uploading file:', uploadError);
+          // Continue with successful complaint submission even if file upload fails
+        } else {
+          // Save attachment record
+          const { error: attachmentError } = await supabase
+            .from('complaint_attachments')
+            .insert({
+              complaint_id: complaintData.id,
+              file_path: filePath,
+              file_name: file.name,
+              file_type: file.type,
+              file_size: file.size,
+            });
+
+          if (attachmentError) {
+            console.error('Error saving attachment record:', attachmentError);
+          }
+        }
+      }
+
+      toast({
+        title: "Sukses",
+        description: "Pengaduan berhasil dikirim",
+      });
+      
+      // Reset form
+      setTitle("");
+      setDescription("");
+      setFile(null);
+      setIsAnonymous(false);
+      
+      // Refresh complaints list
+      fetchComplaints();
+      
+    } catch (error) {
+      console.error('Error submitting complaint:', error);
+      toast({
+        title: "Error",
+        description: "Gagal mengirim pengaduan",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat('id-ID', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    }).format(date);
   };
 
   return (
@@ -99,7 +219,7 @@ const Pengaduan: React.FC = () => {
           
           <label className="flex items-center gap-2 cursor-pointer p-2 border rounded hover:bg-gray-50">
             <Upload className="h-4 w-4" />
-            <span className="text-sm">Unggah Bukti</span>
+            <span className="text-sm">{file ? file.name : "Unggah Bukti"}</span>
             <input type="file" className="hidden" onChange={handleFileChange} />
           </label>
           
@@ -115,8 +235,16 @@ const Pengaduan: React.FC = () => {
           <Button 
             className="w-full bg-teal hover:bg-teal/90" 
             onClick={handleSubmit}
+            disabled={isSubmitting}
           >
-            Kirim Pengaduan
+            {isSubmitting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Mengirim...
+              </>
+            ) : (
+              "Kirim Pengaduan"
+            )}
           </Button>
         </div>
       </div>
@@ -124,17 +252,29 @@ const Pengaduan: React.FC = () => {
       {/* Status Pengaduan */}
       <div className="p-4">
         <h2 className="font-semibold text-lg mb-2">Riwayat Pengaduan</h2>
-        {reports.map((report) => (
-          <Card key={report.id} className="p-4 mb-4">
-            <h3 className="font-semibold">{report.title}</h3>
-            <p className="text-sm text-gray-600">{report.category} - {report.date}</p>
-            <span className={`text-sm font-semibold ${
-              report.status === "Pending" ? "text-yellow-500" : "text-green-500"
-            }`}>
-              {report.status}
-            </span>
+        
+        {isLoading ? (
+          <div className="flex justify-center p-8">
+            <Loader2 className="h-8 w-8 animate-spin text-teal" />
+          </div>
+        ) : complaints.length > 0 ? (
+          complaints.map((complaint) => (
+            <Card key={complaint.id} className="p-4 mb-4">
+              <h3 className="font-semibold">{complaint.title}</h3>
+              <p className="text-sm text-gray-600">{complaint.category} - {formatDate(complaint.created_at)}</p>
+              <span className={`text-sm font-semibold ${
+                complaint.status === "Pending" ? "text-yellow-500" : 
+                complaint.status === "Ditolak" ? "text-red-500" : "text-green-500"
+              }`}>
+                {complaint.status}
+              </span>
+            </Card>
+          ))
+        ) : (
+          <Card className="p-4 text-center text-gray-500">
+            Belum ada pengaduan yang diajukan
           </Card>
-        ))}
+        )}
       </div>
 
       {/* Floating Button */}
