@@ -12,6 +12,9 @@ import Register from "./pages/Register";
 import OtpVerification from "./pages/OtpVerification";
 import RegistrationSuccess from "./pages/RegistrationSuccess";
 import Dashboard from "./pages/Dashboard";
+import KonsultasiHukum from "./pages/KonsultasiHukum";
+import AIConsultation from "./pages/AIConsultation";
+import LiveChat from "./pages/LiveChat";
 import Pengaduan from "./pages/Pengaduan";
 import Profile from "./pages/Profile";
 import ForumDiskusi from "./pages/ForumDiskusi";
@@ -39,6 +42,21 @@ const App = () => (
                 <Dashboard />
               </ProtectedRoute>
             } />
+            <Route path="/konsultasi-hukum" element={
+              <ProtectedRoute>
+                <KonsultasiHukum />
+              </ProtectedRoute>
+            } />
+            <Route path="/konsultasi-hukum/ai" element={
+              <ProtectedRoute>
+                <AIConsultation />
+              </ProtectedRoute>
+            } />
+            <Route path="/konsultasi-hukum/live" element={
+              <ProtectedRoute>
+                <LiveChat />
+              </ProtectedRoute>
+            } />
             <Route path="/pengaduan" element={
               <ProtectedRoute>
                 <Pengaduan />
@@ -53,11 +71,6 @@ const App = () => (
               <ProtectedRoute>
                 <ForumDiskusi />
               </ProtectedRoute>
-            } />
-            
-            {/* Redirect old konsultasi path to dashboard */}
-            <Route path="/konsultasi-hukum" element={
-              <Navigate to="/dashboard" replace />
             } />
             
             {/* Catch-all route */}
