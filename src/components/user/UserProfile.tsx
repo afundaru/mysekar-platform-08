@@ -39,26 +39,26 @@ const UserProfile: React.FC = () => {
       // Generate a unique file name
       const fileExt = file.name.split('.').pop();
       const fileName = `${user.id}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-      const filePath = `avatars/${fileName}`;
+      const filePath = `${fileName}`;
       
       // Upload the file to Supabase Storage
-      const { error: uploadError } = await supabase.storage
+      const { error: uploadError, data } = await supabase.storage
         .from('avatars')
         .upload(filePath, file);
         
       if (uploadError) throw uploadError;
       
       // Get the public URL
-      const { data } = supabase.storage.from('avatars').getPublicUrl(filePath);
+      const { data: publicUrlData } = supabase.storage.from('avatars').getPublicUrl(filePath);
       
       // Update user metadata with avatar URL
       const { error: updateError } = await supabase.auth.updateUser({
-        data: { avatar_url: data.publicUrl }
+        data: { avatar_url: publicUrlData.publicUrl }
       });
       
       if (updateError) throw updateError;
       
-      setAvatarUrl(data.publicUrl);
+      setAvatarUrl(publicUrlData.publicUrl);
       toast.success("Foto profil berhasil diperbarui");
     } catch (error) {
       console.error('Error uploading avatar:', error);
@@ -126,6 +126,7 @@ const UserProfile: React.FC = () => {
                     size="icon" 
                     variant="ghost" 
                     className="absolute -bottom-2 -right-2 h-7 w-7 rounded-full bg-teal hover:bg-teal-600"
+                    disabled={uploading}
                   >
                     <Camera className="h-3.5 w-3.5 text-white" />
                   </Button>

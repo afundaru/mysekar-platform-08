@@ -14,6 +14,8 @@ import { useAuth } from '@/contexts/AuthContext';
 
 const DashboardHeader: React.FC = () => {
   const { user } = useAuth();
+  
+  // Get avatar URL from user metadata
   const avatarUrl = user?.user_metadata?.avatar_url || "https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-1.jpg";
   
   return (
@@ -24,6 +26,10 @@ const DashboardHeader: React.FC = () => {
             src={avatarUrl}
             alt="Profile" 
             className="w-full h-full object-cover"
+            onError={(e) => {
+              // Fallback if image fails to load
+              (e.target as HTMLImageElement).src = "https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-1.jpg";
+            }}
           />
         </div>
         <div>
