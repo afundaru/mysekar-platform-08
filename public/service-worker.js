@@ -10,7 +10,12 @@ const urlsToCache = [
   '/',
   '/index.html',
   '/manifest.json',
-  '/favicon.ico'
+  '/favicon.ico',
+  '/dashboard',
+  '/konsultasi-hukum',
+  '/pengaduan',
+  '/profile',
+  '/forum-diskusi'
 ];
 
 // Install a service worker

@@ -15,6 +15,7 @@ import Dashboard from "./pages/Dashboard";
 import KonsultasiHukum from "./pages/KonsultasiHukum";
 import Pengaduan from "./pages/Pengaduan";
 import Profile from "./pages/Profile";
+import ForumDiskusi from "./pages/ForumDiskusi";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -52,6 +53,11 @@ const App = () => (
             <Route path="/profile" element={
               <ProtectedRoute>
                 <Profile />
+              </ProtectedRoute>
+            } />
+            <Route path="/forum-diskusi" element={
+              <ProtectedRoute>
+                <ForumDiskusi />
               </ProtectedRoute>
             } />
             
