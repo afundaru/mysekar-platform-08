@@ -42,7 +42,7 @@ const ConsultationOptions: React.FC<ConsultationOptionsProps> = ({ onStartChat }
         {options.map((option) => (
           <div 
             key={option.id} 
-            className="bg-white p-4 rounded-lg shadow-sm flex flex-col items-center text-center cursor-pointer hover:bg-gray-50"
+            className="bg-white p-4 rounded-lg shadow-sm flex flex-col items-center text-center cursor-pointer hover:bg-gray-50 transition-colors"
             onClick={option.action}
           >
             <div className="mb-2">{option.icon}</div>

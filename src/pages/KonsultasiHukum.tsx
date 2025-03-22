@@ -17,7 +17,7 @@ const KonsultasiHukum: React.FC = () => {
       
       {activeView === 'main' ? (
         <>
-          {/* Header */}
+          {/* Header with updated title */}
           <ConsultationHeader />
           
           {/* Main Content */}
