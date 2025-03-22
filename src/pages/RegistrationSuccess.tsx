@@ -3,6 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { CheckCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import AuthLayout from '@/components/auth/AuthLayout';
 
 const RegistrationSuccess: React.FC = () => {
   const navigate = useNavigate();
@@ -12,15 +13,8 @@ const RegistrationSuccess: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Status Bar */}
-      <div className="bg-teal h-6"></div>
-
-      <div className="px-6 py-8 text-center">
-        <div className="flex justify-center mb-8">
-          <h1 className="text-2xl font-bold text-teal">MySEKAR</h1>
-        </div>
-        
+    <AuthLayout title="">
+      <div className="text-center">
         <div className="mb-8">
           <CheckCircle className="h-24 w-24 text-teal mx-auto" />
         </div>
@@ -36,7 +30,7 @@ const RegistrationSuccess: React.FC = () => {
           Masuk ke Akun
         </Button>
       </div>
-    </div>
+    </AuthLayout>
   );
 };
 
