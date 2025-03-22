@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -30,10 +31,25 @@ const App = () => (
             <Route path="/register" element={<Register />} />
             <Route path="/otp-verification" element={<OtpVerification />} />
             <Route path="/registration-success" element={<RegistrationSuccess />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/konsultasi-hukum" element={<KonsultasiHukum />} />
-            <Route path="/pengaduan" element={<Pengaduan />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            
+            {/* Protected Routes */}
+            <Route path="/dashboard" element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/konsultasi-hukum" element={
+              <ProtectedRoute>
+                <KonsultasiHukum />
+              </ProtectedRoute>
+            } />
+            <Route path="/pengaduan" element={
+              <ProtectedRoute>
+                <Pengaduan />
+              </ProtectedRoute>
+            } />
+            
+            {/* Catch-all route */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

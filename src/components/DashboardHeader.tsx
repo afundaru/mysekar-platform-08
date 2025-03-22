@@ -1,7 +1,19 @@
 
 import React from 'react';
+import { Bell, Settings } from 'lucide-react';
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu';
+import SignOutButton from './auth/SignOutButton';
+import { useAuth } from '@/contexts/AuthContext';
 
 const DashboardHeader: React.FC = () => {
+  const { user } = useAuth();
+  
   return (
     <header className="bg-white px-4 py-3 flex justify-between items-center shadow-sm">
       <div className="flex items-center space-x-3">
@@ -13,7 +25,7 @@ const DashboardHeader: React.FC = () => {
           />
         </div>
         <div>
-          <h2 className="text-sm font-semibold">Sarah Amelia</h2>
+          <h2 className="text-sm font-semibold">{user?.email?.split('@')[0] || 'Pengguna'}</h2>
           <span className="text-xs text-teal">Anggota Aktif</span>
         </div>
       </div>
@@ -22,15 +34,23 @@ const DashboardHeader: React.FC = () => {
           <Bell className="h-5 w-5" />
           <span className="absolute -top-1 -right-1 bg-red-500 w-2 h-2 rounded-full"></span>
         </button>
-        <button className="text-gray-600">
-          <Settings className="h-5 w-5" />
-        </button>
+        <DropdownMenu>
+          <DropdownMenuTrigger className="focus:outline-none">
+            <Settings className="h-5 w-5 text-gray-600" />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem>
+              Pengaturan Profil
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>
+              <SignOutButton variant="ghost" showIcon={true} className="w-full justify-start p-0 h-auto font-normal" />
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </header>
   );
 };
 
 export default DashboardHeader;
-
-// Import Lucide icons
-import { Bell, Settings } from 'lucide-react';

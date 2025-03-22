@@ -1,43 +1,73 @@
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Home, MessageSquare, Plus, Megaphone, User } from 'lucide-react';
+import { NavLink, useLocation } from 'react-router-dom';
+import { Home, FileText, MessageSquare, User } from 'lucide-react';
+import { 
+  NavigationMenu,
+  NavigationMenuList,
+  NavigationMenuItem
+} from '@/components/ui/navigation-menu';
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu';
+import SignOutButton from './auth/SignOutButton';
 
 const DashboardBottomNavigation: React.FC = () => {
-  const navigate = useNavigate();
-
+  const location = useLocation();
+  
+  const isActive = (path: string) => {
+    return location.pathname === path ? 'text-teal' : 'text-gray-500';
+  };
+  
   return (
-    <nav className="fixed bottom-0 w-full bg-white border-t border-gray-200 px-4 py-2">
-      <div className="flex justify-around items-center">
-        <button 
-          className="flex flex-col items-center text-teal"
-          onClick={() => navigate('/dashboard')}
-        >
-          <Home className="h-5 w-5" />
-          <span className="text-xs mt-1">Beranda</span>
-        </button>
-        <button className="flex flex-col items-center text-gray-400">
-          <MessageSquare className="h-5 w-5" />
-          <span className="text-xs mt-1">Forum</span>
-        </button>
-        <div className="relative -top-5">
-          <button className="bg-primary-blue w-14 h-14 rounded-full flex items-center justify-center shadow-lg">
-            <Plus className="h-6 w-6 text-white" />
-          </button>
-        </div>
-        <button className="flex flex-col items-center text-gray-400">
-          <Megaphone className="h-5 w-5" />
-          <span className="text-xs mt-1">Pengumuman</span>
-        </button>
-        <button 
-          className="flex flex-col items-center text-gray-400"
-          onClick={() => navigate('/profile')}
-        >
-          <User className="h-5 w-5" />
-          <span className="text-xs mt-1">Profil</span>
-        </button>
-      </div>
-    </nav>
+    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-3">
+      <NavigationMenu className="max-w-full mx-auto">
+        <NavigationMenuList className="justify-around w-full">
+          <NavigationMenuItem>
+            <NavLink to="/dashboard" className={`flex flex-col items-center ${isActive('/dashboard')}`}>
+              <Home className="h-5 w-5" />
+              <span className="text-xs mt-1">Beranda</span>
+            </NavLink>
+          </NavigationMenuItem>
+          
+          <NavigationMenuItem>
+            <NavLink to="/pengaduan" className={`flex flex-col items-center ${isActive('/pengaduan')}`}>
+              <FileText className="h-5 w-5" />
+              <span className="text-xs mt-1">Pengaduan</span>
+            </NavLink>
+          </NavigationMenuItem>
+          
+          <NavigationMenuItem>
+            <NavLink to="/konsultasi-hukum" className={`flex flex-col items-center ${isActive('/konsultasi-hukum')}`}>
+              <MessageSquare className="h-5 w-5" />
+              <span className="text-xs mt-1">Konsultasi</span>
+            </NavLink>
+          </NavigationMenuItem>
+          
+          <NavigationMenuItem>
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex flex-col items-center focus:outline-none">
+                <User className={`h-5 w-5 ${isActive('/profile')}`} />
+                <span className="text-xs mt-1">Profil</span>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem>
+                  Pengaturan Profil
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>
+                  <SignOutButton variant="ghost" showIcon={true} className="w-full justify-start p-0 h-auto font-normal" />
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </NavigationMenuItem>
+        </NavigationMenuList>
+      </NavigationMenu>
+    </div>
   );
 };
 
