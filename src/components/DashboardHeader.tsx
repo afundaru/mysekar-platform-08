@@ -14,13 +14,14 @@ import { useAuth } from '@/contexts/AuthContext';
 
 const DashboardHeader: React.FC = () => {
   const { user } = useAuth();
+  const avatarUrl = user?.user_metadata?.avatar_url || "https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-1.jpg";
   
   return (
     <header className="bg-white px-4 py-3 flex justify-between items-center shadow-sm">
       <Link to="/profile" className="flex items-center space-x-3">
         <div className="w-10 h-10 rounded-full bg-gray-300 overflow-hidden">
           <img 
-            src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-1.jpg" 
+            src={avatarUrl}
             alt="Profile" 
             className="w-full h-full object-cover"
           />
