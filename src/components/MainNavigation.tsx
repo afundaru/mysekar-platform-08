@@ -10,7 +10,7 @@ const MainNavigation: React.FC = () => {
     <section className="px-4 py-6">
       <h2 className="text-lg font-semibold mb-4">Menu Utama</h2>
       <div className="grid grid-cols-3 gap-4">
-        <NavItem icon={<MessageSquare className="h-6 w-6" />} label="Forum" />
+        <NavItem icon={<MessageSquare className="h-6 w-6" />} label="Forum Diskusi" />
         <NavItem icon={<Megaphone className="h-6 w-6" />} label="Pengumuman" />
         <NavItem 
           icon={<FilePen className="h-6 w-6" />} 
