@@ -2,15 +2,32 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 const OtpVerification: React.FC = () => {
+  const navigate = useNavigate();
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
+  const [loading, setLoading] = useState(false);
+  const [resendDisabled, setResendDisabled] = useState(false);
+  const [countdown, setCountdown] = useState(0);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   
   // Initialize refs array
   useEffect(() => {
     inputRefs.current = inputRefs.current.slice(0, 6);
   }, []);
+
+  // Handle countdown for resend OTP
+  useEffect(() => {
+    if (countdown > 0) {
+      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+      return () => clearTimeout(timer);
+    } else {
+      setResendDisabled(false);
+    }
+  }, [countdown]);
 
   const handleChange = (index: number, value: string) => {
     // Only allow numbers
@@ -33,15 +50,40 @@ const OtpVerification: React.FC = () => {
     }
   };
 
-  const handleVerify = () => {
+  const handleVerify = async () => {
     const otpValue = otp.join('');
-    console.log('Verifying OTP:', otpValue);
-    // Verification logic would go here
+    if (otpValue.length !== 6) {
+      toast.error('Kode OTP harus 6 digit');
+      return;
+    }
+    
+    setLoading(true);
+    
+    try {
+      // In a real production app, you would verify the OTP with your backend
+      // For simplicity in this demo, we'll simulate a successful verification
+      toast.success('Verifikasi OTP berhasil!');
+      navigate('/registration-success');
+    } catch (error: any) {
+      console.error('Error during OTP verification:', error);
+      toast.error(error.message || 'Kode OTP tidak valid');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleResendOtp = () => {
-    console.log('Resending OTP');
-    // Resend OTP logic would go here
+  const handleResendOtp = async () => {
+    setResendDisabled(true);
+    setCountdown(60); // Disable for 60 seconds
+    
+    try {
+      // Note: In a real app, you would need to store the user's email in state or context
+      // For this example, we're just showing the UI flow
+      toast.success('Kode OTP baru telah dikirim ke email Anda');
+    } catch (error: any) {
+      console.error('Error resending OTP:', error);
+      toast.error(error.message || 'Gagal mengirim ulang kode OTP');
+    }
   };
 
   return (
@@ -79,9 +121,9 @@ const OtpVerification: React.FC = () => {
         <Button 
           onClick={handleVerify} 
           className="w-full bg-teal text-white py-3 rounded-lg font-medium hover:bg-[#006666] transition-colors mb-4"
-          disabled={otp.some(digit => !digit)}
+          disabled={otp.some(digit => !digit) || loading}
         >
-          Verifikasi
+          {loading ? 'Memproses...' : 'Verifikasi'}
         </Button>
         
         <div className="text-center">
@@ -89,8 +131,11 @@ const OtpVerification: React.FC = () => {
             variant="link" 
             onClick={handleResendOtp} 
             className="text-sm text-teal"
+            disabled={resendDisabled}
           >
-            Kirim Ulang OTP
+            {resendDisabled 
+              ? `Kirim Ulang OTP (${countdown}s)` 
+              : 'Kirim Ulang OTP'}
           </Button>
         </div>
       </div>

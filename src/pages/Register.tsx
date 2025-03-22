@@ -1,21 +1,79 @@
 
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Eye, EyeOff } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 const Register: React.FC = () => {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [agreed, setAgreed] = useState(false);
+  const [loading, setLoading] = useState(false);
+  
+  // Form state
+  const [fullName, setFullName] = useState('');
+  const [pnNumber, setPnNumber] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  
+  // Form validation
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+    
+    if (!fullName) newErrors.fullName = 'Nama lengkap harus diisi';
+    if (!pnNumber) newErrors.pnNumber = 'Nomor PN harus diisi';
+    if (!email) newErrors.email = 'Email harus diisi';
+    else if (!email.endsWith('@bankraya.co.id')) newErrors.email = 'Email harus menggunakan domain @bankraya.co.id';
+    if (!phone) newErrors.phone = 'Nomor HP harus diisi';
+    if (!password) newErrors.password = 'Password harus diisi';
+    else if (password.length < 8) newErrors.password = 'Password minimal 8 karakter';
+    if (password !== confirmPassword) newErrors.confirmPassword = 'Konfirmasi password tidak sesuai';
+    if (!agreed) newErrors.agreed = 'Anda harus menyetujui syarat dan ketentuan';
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Registration logic would go here
-    console.log('Registration submitted');
+    
+    if (!validateForm()) return;
+    
+    setLoading(true);
+    
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: fullName,
+            pn_number: pnNumber,
+            phone_number: phone
+          }
+        }
+      });
+      
+      if (error) throw error;
+      
+      toast.success('Pendaftaran berhasil!');
+      navigate('/otp-verification');
+    } catch (error: any) {
+      console.error('Error during registration:', error);
+      toast.error(error.message || 'Terjadi kesalahan saat mendaftar');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -38,7 +96,10 @@ const Register: React.FC = () => {
               type="text" 
               placeholder="Masukkan nama lengkap" 
               className="w-full px-4 py-3 rounded-lg"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
             />
+            {errors.fullName && <p className="text-red-500 text-xs mt-1">{errors.fullName}</p>}
           </div>
           
           <div className="space-y-2">
@@ -48,7 +109,10 @@ const Register: React.FC = () => {
               type="text" 
               placeholder="Masukkan nomor PN" 
               className="w-full px-4 py-3 rounded-lg"
+              value={pnNumber}
+              onChange={(e) => setPnNumber(e.target.value)}
             />
+            {errors.pnNumber && <p className="text-red-500 text-xs mt-1">{errors.pnNumber}</p>}
           </div>
           
           <div className="space-y-2">
@@ -58,7 +122,10 @@ const Register: React.FC = () => {
               type="email" 
               placeholder="Masukkan email @bankraya.co.id" 
               className="w-full px-4 py-3 rounded-lg"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
+            {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
           </div>
           
           <div className="space-y-2">
@@ -68,7 +135,10 @@ const Register: React.FC = () => {
               type="tel" 
               placeholder="Masukkan nomor HP" 
               className="w-full px-4 py-3 rounded-lg"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
             />
+            {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
           </div>
           
           <div className="space-y-2">
@@ -79,6 +149,8 @@ const Register: React.FC = () => {
                 type={showPassword ? "text" : "password"} 
                 placeholder="Min. 8 karakter" 
                 className="w-full px-4 py-3 rounded-lg"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
               <button 
                 type="button"
@@ -88,6 +160,7 @@ const Register: React.FC = () => {
                 {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
               </button>
             </div>
+            {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
           </div>
           
           <div className="space-y-2">
@@ -98,6 +171,8 @@ const Register: React.FC = () => {
                 type={showConfirmPassword ? "text" : "password"} 
                 placeholder="Ulangi password" 
                 className="w-full px-4 py-3 rounded-lg"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
               />
               <button 
                 type="button"
@@ -107,6 +182,7 @@ const Register: React.FC = () => {
                 {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
               </button>
             </div>
+            {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>}
           </div>
           
           <div className="flex items-start space-x-3">
@@ -120,13 +196,14 @@ const Register: React.FC = () => {
               Saya setuju dengan <Link to="/terms" className="text-teal cursor-pointer">Syarat & Ketentuan</Link>
             </Label>
           </div>
+          {errors.agreed && <p className="text-red-500 text-xs mt-1">{errors.agreed}</p>}
           
           <Button 
             type="submit" 
             className="w-full bg-teal text-white py-3 rounded-lg font-medium hover:bg-[#006666] transition-colors"
-            disabled={!agreed}
+            disabled={!agreed || loading}
           >
-            Daftar
+            {loading ? 'Memproses...' : 'Daftar'}
           </Button>
         </form>
         
