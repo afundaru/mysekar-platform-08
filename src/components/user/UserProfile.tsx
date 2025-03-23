@@ -11,7 +11,7 @@ import MembershipInfo from './MembershipInfo';
 import { useNavigate } from 'react-router-dom';
 
 const UserProfile: React.FC = () => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const [editing, setEditing] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -51,7 +51,8 @@ const UserProfile: React.FC = () => {
     return <ProfileEditForm onCancel={() => setEditing(false)} />;
   }
   
-  if (!user) {
+  // Show loading state while auth is being initialized
+  if (loading) {
     return (
       <div className="w-full max-w-md mx-auto p-4">
         <div className="flex justify-center items-center h-48">
@@ -60,6 +61,21 @@ const UserProfile: React.FC = () => {
       </div>
     );
   }
+  
+  if (!user) {
+    return (
+      <div className="w-full max-w-md mx-auto p-4">
+        <div className="flex flex-col justify-center items-center h-48">
+          <p className="text-gray-500 mb-4">Sesi tidak valid atau Anda belum login</p>
+          <Button onClick={() => navigate('/login')} className="bg-teal hover:bg-teal-600">
+            Login
+          </Button>
+        </div>
+      </div>
+    );
+  }
+  
+  console.log("User data in UserProfile:", user); // Debug logging
   
   return (
     <div className="w-full max-w-md mx-auto">

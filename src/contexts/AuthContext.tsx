@@ -29,13 +29,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isAdmin, setIsAdmin] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
+  // Reduced timeout for admin check to prevent long waits
   const checkIsAdmin = useCallback(async (): Promise<boolean> => {
     if (!user) return false;
     
     try {
-      // Aumentar el timeout a 20 segundos para evitar errores frecuentes de timeout
+      // Reduce timeout to 5 seconds to avoid UI freezing for too long
       const timeoutPromise = new Promise<{data: null, error: Error}>((_, reject) => {
-        setTimeout(() => reject(new Error('Request timeout')), 20000);
+        setTimeout(() => reject(new Error('Request timeout')), 5000);
       });
       
       const fetchPromise = supabase
@@ -49,10 +50,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (error) {
         console.error('Error checking admin status:', error);
-        // Si es un error de timeout, no cambiar el estado actual
+        // If it's a timeout error, use the cached state
         if (error.message === 'Request timeout') {
           console.warn('Admin check timed out, using cached state');
-          return isAdmin; // Mantener el estado actual
+          return isAdmin;
         }
         return false;
       }
@@ -63,16 +64,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return isUserAdmin;
     } catch (error) {
       console.error('Error checking admin status:', error);
-      // Si hay un error, asumir que el usuario no es admin
-      // pero mantener el estado actual si ya estaba establecido
-      return isAdmin; // Return current state if there's an error
+      return isAdmin;
     }
   }, [user, isAdmin]);
 
   useEffect(() => {
     const setupAuth = async () => {
       try {
-        // First set up the auth state change listener
+        // Set up the auth state change listener FIRST
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
           async (event, currentSession) => {
             console.log('Auth event:', event);
@@ -81,12 +80,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setUser(currentSession?.user ?? null);
             
             if (currentSession?.user) {
+              // Set a default user role immediately
+              setUserRole('user');
+              
+              // Then check admin status in the background
               try {
                 await checkIsAdmin();
               } catch (e) {
                 console.error('Failed to check admin status after auth change:', e);
-                // Si falla la verificación, asumir rol de usuario regular
-                setUserRole('user');
               }
             } else {
               setIsAdmin(false);
@@ -97,18 +98,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
         );
 
-        // Then check for any existing session
+        // THEN check for any existing session
         const { data: { session: currentSession } } = await supabase.auth.getSession();
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
         
         if (currentSession?.user) {
+          // Set a default user role immediately
+          setUserRole('user');
+          
+          // Then check admin status in the background
           try {
             await checkIsAdmin();
           } catch (e) {
             console.error('Failed to check admin status on initial load:', e);
-            // En caso de error durante la carga inicial, establecer como usuario regular
-            setUserRole('user');
           }
         }
         
