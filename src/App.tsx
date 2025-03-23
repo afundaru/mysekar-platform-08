@@ -9,16 +9,18 @@ import AppRoutes from './routes/AppRoutes';
 function App() {
   console.log("App rendering");
   return (
-    <Router>
-      <TooltipProvider>
-        <AuthProvider>
-          <div className="App">
-            <Toaster />
-            <AppRoutes />
-          </div>
-        </AuthProvider>
-      </TooltipProvider>
-    </Router>
+    <React.StrictMode>
+      <Router>
+        <TooltipProvider>
+          <AuthProvider>
+            <div className="App">
+              <Toaster />
+              <AppRoutes />
+            </div>
+          </AuthProvider>
+        </TooltipProvider>
+      </Router>
+    </React.StrictMode>
   );
 }
 

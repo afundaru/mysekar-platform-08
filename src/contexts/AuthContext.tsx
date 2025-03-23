@@ -156,7 +156,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         return () => {
           subscription.unsubscribe();
-          mounted = false;
         };
       } catch (e) {
         console.error('Error setting up auth:', e);
