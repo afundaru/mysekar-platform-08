@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import Header from '@/components/Header';
 import HeroBanner from '@/components/HeroBanner';
 import AnnouncementSection from '@/components/AnnouncementSection';
@@ -7,11 +7,13 @@ import QuickAccess from '@/components/QuickAccess';
 import Statistics from '@/components/Statistics';
 import BottomNavigation from '@/components/BottomNavigation';
 
-const Index = () => {
-  // Add subtle animation on initial load
-  useEffect(() => {
+const Index: React.FC = () => {
+  // Use an effect to handle body class management
+  React.useEffect(() => {
+    // Add subtle animation on initial load
     document.body.classList.add('overflow-x-hidden');
     
+    // Clean up function to remove the class when component unmounts
     return () => {
       document.body.classList.remove('overflow-x-hidden');
     };
