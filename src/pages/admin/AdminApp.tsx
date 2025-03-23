@@ -1,6 +1,5 @@
 
 import React, { lazy, Suspense } from "react";
-import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import AdminSidebar from "./components/AdminSidebar";
 import { Keanggotaan, Forum, Pengaduan, Konsultasi } from "./components/AdminModules";
@@ -41,10 +40,37 @@ const ErrorBoundary = ({ children }: { children: React.ReactNode }) => {
 };
 
 const AdminApp = () => {
-  const location = useLocation();
+  const pathname = window.location.pathname;
+  
+  // Determine which component to render based on the path
+  const renderContent = () => {
+    const path = pathname.replace('/admin/', '');
+    
+    switch (path) {
+      case '':
+      case 'admin':
+        return <DashboardAdmin />;
+      case 'keanggotaan':
+        return <Keanggotaan />;
+      case 'forum':
+        return <Forum />;
+      case 'pengaduan':
+        return <Pengaduan />;
+      case 'konsultasi':
+        return <Konsultasi />;
+      case 'add-admin':
+        return <AddAdmin />;
+      case 'announcements':
+        return <AnnouncementManager />;
+      default:
+        // Redirect to admin dashboard for unknown routes
+        window.location.href = '/admin';
+        return <LoadingFallback />;
+    }
+  };
   
   // Add console.log to help debug
-  console.log("AdminApp rendered, pathname:", location.pathname);
+  console.log("AdminApp rendered, pathname:", pathname);
   
   return (
     <ErrorBoundary>
@@ -55,16 +81,7 @@ const AdminApp = () => {
             <div className="bg-teal h-2" />
             <main className="p-4">
               <Suspense fallback={<LoadingFallback />}>
-                <Routes>
-                  <Route index element={<DashboardAdmin />} />
-                  <Route path="keanggotaan" element={<Keanggotaan />} />
-                  <Route path="forum" element={<Forum />} />
-                  <Route path="pengaduan" element={<Pengaduan />} />
-                  <Route path="konsultasi" element={<Konsultasi />} />
-                  <Route path="add-admin" element={<AddAdmin />} />
-                  <Route path="announcements" element={<AnnouncementManager />} /> {/* Add this route */}
-                  <Route path="*" element={<Navigate to="/admin" replace />} />
-                </Routes>
+                {renderContent()}
               </Suspense>
             </main>
           </div>

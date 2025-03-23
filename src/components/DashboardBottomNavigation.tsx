@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
 import { Home, FileText, MessageSquare, User } from 'lucide-react';
 import { 
   NavigationMenu,
@@ -9,10 +8,10 @@ import {
 } from '@/components/ui/navigation-menu';
 
 const DashboardBottomNavigation: React.FC = () => {
-  const location = useLocation();
+  const currentPath = window.location.pathname;
   
   const isActive = (path: string) => {
-    return location.pathname === path ? 'text-teal' : 'text-gray-500';
+    return currentPath === path ? 'text-teal' : 'text-gray-500';
   };
   
   return (
@@ -20,31 +19,31 @@ const DashboardBottomNavigation: React.FC = () => {
       <NavigationMenu className="max-w-full mx-auto">
         <NavigationMenuList className="justify-around w-full">
           <NavigationMenuItem>
-            <NavLink to="/dashboard" className={`flex flex-col items-center ${isActive('/dashboard')}`}>
+            <a href="/dashboard" className={`flex flex-col items-center ${isActive('/dashboard')}`}>
               <Home className="h-5 w-5" />
               <span className="text-xs mt-1">Beranda</span>
-            </NavLink>
+            </a>
           </NavigationMenuItem>
           
           <NavigationMenuItem>
-            <NavLink to="/pengaduan" className={`flex flex-col items-center ${isActive('/pengaduan')}`}>
+            <a href="/pengaduan" className={`flex flex-col items-center ${isActive('/pengaduan')}`}>
               <FileText className="h-5 w-5" />
               <span className="text-xs mt-1">Pengaduan</span>
-            </NavLink>
+            </a>
           </NavigationMenuItem>
           
           <NavigationMenuItem>
-            <NavLink to="/konsultasi" className={`flex flex-col items-center ${isActive('/konsultasi')}`}>
+            <a href="/konsultasi" className={`flex flex-col items-center ${isActive('/konsultasi')}`}>
               <MessageSquare className="h-5 w-5" />
               <span className="text-xs mt-1">Konsultasi</span>
-            </NavLink>
+            </a>
           </NavigationMenuItem>
           
           <NavigationMenuItem>
-            <NavLink to="/profile" className={`flex flex-col items-center ${isActive('/profile')}`}>
+            <a href="/profile" className={`flex flex-col items-center ${isActive('/profile')}`}>
               <User className="h-5 w-5" />
               <span className="text-xs mt-1">Profil</span>
-            </NavLink>
+            </a>
           </NavigationMenuItem>
         </NavigationMenuList>
       </NavigationMenu>
