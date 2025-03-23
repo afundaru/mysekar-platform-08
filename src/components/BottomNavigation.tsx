@@ -1,44 +1,32 @@
 
 import React from 'react';
-import { Home, Bell, Bot, User } from 'lucide-react';
+import { Home, MessageSquare, Flag, Gavel, UserCircle } from 'lucide-react';
 
 const BottomNavigation: React.FC = () => {
-  // Get the current path to highlight the active link
-  const currentPath = window.location.pathname;
-
+  // Use standard anchor tags instead of react-router hooks
   return (
-    <nav className="fixed bottom-0 w-full bg-white border-t border-gray-200 px-4 py-2">
-      <div className="flex justify-around items-center">
-        <a 
-          href="/" 
-          className={`flex flex-col items-center ${currentPath === '/' ? 'text-teal' : 'text-gray-400'}`}
-        >
-          <Home className="h-5 w-5" />
-          <span className="text-xs mt-1">Beranda</span>
-        </a>
-        <a 
-          href="/announcements"
-          className={`flex flex-col items-center ${currentPath === '/announcements' ? 'text-teal' : 'text-gray-400'}`}
-        >
-          <Bell className="h-5 w-5" />
-          <span className="text-xs mt-1">Pengumuman</span>
-        </a>
-        <a 
-          href="/konsultasi"
-          className={`flex flex-col items-center ${currentPath === '/konsultasi' ? 'text-teal' : 'text-gray-400'}`}
-        >
-          <Bot className="h-5 w-5" />
-          <span className="text-xs mt-1">Konsultasi</span>
-        </a>
-        <a 
-          href="/login"
-          className={`flex flex-col items-center ${currentPath === '/login' ? 'text-teal' : 'text-gray-400'}`}
-        >
-          <User className="h-5 w-5" />
-          <span className="text-xs mt-1">Masuk</span>
-        </a>
-      </div>
-    </nav>
+    <div className="bg-white p-2 border-t flex justify-around items-center">
+      <a href="/" className="flex flex-col items-center text-gray-600 hover:text-teal p-1">
+        <Home className="h-6 w-6" />
+        <span className="text-xs">Beranda</span>
+      </a>
+      <a href="/forum" className="flex flex-col items-center text-gray-600 hover:text-teal p-1">
+        <MessageSquare className="h-6 w-6" />
+        <span className="text-xs">Forum</span>
+      </a>
+      <a href="/pengaduan" className="flex flex-col items-center text-gray-600 hover:text-teal p-1">
+        <Flag className="h-6 w-6" />
+        <span className="text-xs">Pengaduan</span>
+      </a>
+      <a href="/konsultasi" className="flex flex-col items-center text-gray-600 hover:text-teal p-1">
+        <Gavel className="h-6 w-6" />
+        <span className="text-xs">Konsultasi</span>
+      </a>
+      <a href="/profile" className="flex flex-col items-center text-gray-600 hover:text-teal p-1">
+        <UserCircle className="h-6 w-6" />
+        <span className="text-xs">Profil</span>
+      </a>
+    </div>
   );
 };
 
