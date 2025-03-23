@@ -7,14 +7,6 @@ import {
   NavigationMenuList,
   NavigationMenuItem
 } from '@/components/ui/navigation-menu';
-import { 
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
-import SignOutButton from './auth/SignOutButton';
 
 const DashboardBottomNavigation: React.FC = () => {
   const location = useLocation();
@@ -42,7 +34,7 @@ const DashboardBottomNavigation: React.FC = () => {
           </NavigationMenuItem>
           
           <NavigationMenuItem>
-            <NavLink to="/konsultasi-hukum" className={`flex flex-col items-center ${isActive('/konsultasi-hukum')}`}>
+            <NavLink to="/konsultasi" className={`flex flex-col items-center ${isActive('/konsultasi')}`}>
               <MessageSquare className="h-5 w-5" />
               <span className="text-xs mt-1">Konsultasi</span>
             </NavLink>

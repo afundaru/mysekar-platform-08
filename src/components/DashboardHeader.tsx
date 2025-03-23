@@ -43,8 +43,10 @@ const DashboardHeader: React.FC = () => {
           <span className="absolute -top-1 -right-1 bg-red-500 w-2 h-2 rounded-full"></span>
         </button>
         <DropdownMenu>
-          <DropdownMenuTrigger className="focus:outline-none">
-            <Settings className="h-5 w-5 text-gray-600" />
+          <DropdownMenuTrigger asChild>
+            <button className="focus:outline-none">
+              <Settings className="h-5 w-5 text-gray-600" />
+            </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <Link to="/profile">
