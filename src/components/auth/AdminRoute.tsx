@@ -37,6 +37,7 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
           setHasAccess(false);
         } else {
           setHasAccess(!!data); // true jika data ditemukan, false jika tidak
+          console.log('Admin status check result:', !!data, data);
         }
       } catch (err) {
         console.error('Exception checking admin status:', err);
