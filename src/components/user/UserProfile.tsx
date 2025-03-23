@@ -11,7 +11,9 @@ import MembershipInfo from './MembershipInfo';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const UserProfile: React.FC = () => {
-  // Set up router hooks
+  console.log("UserProfile rendering");
+  
+  // Set up router hooks inside the component body
   const navigate = useNavigate();
   const location = useLocation();
   

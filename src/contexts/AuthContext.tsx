@@ -31,6 +31,8 @@ const AuthContext = createContext<AuthContextType>({
 
 // Export the AuthProvider component
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  console.log("AuthProvider rendering");
+  
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
@@ -122,10 +124,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           
           if (!mounted) return;
           
+          console.log('Initial session check:', { hasSession: !!currentSession });
+          
           setSession(currentSession);
           setUser(currentSession?.user ?? null);
           
           if (currentSession?.user) {
+            console.log('User found in session:', currentSession.user.email);
             // Set a default user role immediately to prevent null roles
             setUserRole('user');
             
@@ -135,6 +140,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             } catch (e) {
               console.error('Failed to check admin status on initial load:', e);
             }
+          } else {
+            console.log('No user found in initial session');
           }
         } catch (e) {
           console.error('Error getting initial session:', e);

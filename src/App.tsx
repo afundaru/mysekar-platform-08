@@ -7,6 +7,7 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import AppRoutes from './routes/AppRoutes';
 
 function App() {
+  console.log("App rendering");
   return (
     <Router>
       <TooltipProvider>
