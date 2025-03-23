@@ -8,13 +8,9 @@ import { toast } from 'sonner';
 import ProfileHeader from './ProfileHeader';
 import PersonalInfo from './PersonalInfo';
 import MembershipInfo from './MembershipInfo';
-import { useNavigate, useLocation } from 'react-router-dom';
 import { Skeleton } from "@/components/ui/skeleton";
 
 const UserProfile: React.FC = () => {
-  // Move all hook calls to the top of the component function
-  const navigate = useNavigate();
-  const location = useLocation();
   const { user, loading } = useAuth();
   
   const [editing, setEditing] = useState(false);
@@ -22,9 +18,7 @@ const UserProfile: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isPageLoading, setIsPageLoading] = useState(true);
   
-  console.log("UserProfile rendering with router context:", { 
-    hasNavigate: !!navigate,
-    currentPath: location.pathname,
+  console.log("UserProfile rendering with:", { 
     userExists: !!user, 
     loading, 
     editing,
@@ -34,7 +28,7 @@ const UserProfile: React.FC = () => {
   // Function to handle going back to dashboard
   const handleGoBack = () => {
     console.log("Navigating back to dashboard");
-    navigate('/dashboard');
+    window.location.href = '/dashboard';
   };
   
   // Load avatar URL from user metadata on component mount
@@ -91,7 +85,7 @@ const UserProfile: React.FC = () => {
       <div className="w-full max-w-md mx-auto p-4">
         <div className="flex flex-col justify-center items-center h-48">
           <p className="text-gray-500 mb-4">Sesi tidak valid atau Anda belum login</p>
-          <Button onClick={() => navigate('/login')} className="bg-teal hover:bg-teal-600">
+          <Button onClick={() => window.location.href = '/login'} className="bg-teal hover:bg-teal-600">
             Login
           </Button>
         </div>
