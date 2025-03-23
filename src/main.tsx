@@ -22,13 +22,13 @@ const root = ReactDOM.createRoot(rootElement);
 // Fix proper React context provider hierarchy
 root.render(
   <React.StrictMode>
-    <TooltipProvider>
-      <Router>
+    <Router>
+      <TooltipProvider>
         <AuthProvider>
           <App />
         </AuthProvider>
-      </Router>
-    </TooltipProvider>
+      </TooltipProvider>
+    </Router>
   </React.StrictMode>
 );
 
