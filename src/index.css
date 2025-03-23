@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -105,7 +106,7 @@
   }
   
   .hero-gradient {
-    @apply bg-gradient-to-t from-black/80 via-black/50 to-yellow-500/30;
+    @apply bg-gradient-to-t from-black/80 via-black/50 to-teal/30;
   }
   
   .animate-delay-100 {
@@ -171,11 +172,11 @@
   background-color: #B71C1C;
 }
 
-/* Union yellow background color */
+/* Union yellow background color - replaced with teal */
 .bg-union-yellow {
-  background-color: #FFC107;
+  background-color: #008080;
 }
 
 .text-union-yellow {
-  color: #FFC107;
+  color: #008080;
 }
