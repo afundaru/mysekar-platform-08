@@ -1,6 +1,8 @@
 
 import React from 'react';
-import { Loader2, AlertCircle } from 'lucide-react';
+import { Loader2, AlertCircle, RefreshCw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 
 interface ComplaintHistoryProps {
   complaints: any[];
@@ -26,23 +28,30 @@ const ComplaintHistory: React.FC<ComplaintHistoryProps> = ({
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg m-4 p-4 text-center">
-        <AlertCircle className="h-8 w-8 text-red-500 mx-auto mb-2" />
-        <p className="text-red-600 mb-2">{error}</p>
-        <button 
-          className="px-4 py-2 bg-teal text-white rounded-lg"
-          onClick={onRetry}
-        >
-          Coba Lagi
-        </button>
+      <div className="p-4">
+        <Card className="p-4 text-center">
+          <AlertCircle className="h-8 w-8 text-red-500 mx-auto mb-2" />
+          <p className="text-red-600 mb-4">{error}</p>
+          <Button 
+            variant="outline"
+            onClick={onRetry}
+            className="mx-auto flex items-center gap-2"
+          >
+            <RefreshCw className="h-4 w-4" />
+            Coba Lagi
+          </Button>
+        </Card>
       </div>
     );
   }
 
   if (complaints.length === 0) {
     return (
-      <div className="bg-white shadow rounded-lg m-4 p-4 text-center">
-        <p className="text-gray-600">Belum ada riwayat pengaduan.</p>
+      <div className="p-4">
+        <Card className="p-6 text-center">
+          <p className="text-gray-600 mb-2">Belum ada riwayat pengaduan.</p>
+          <p className="text-sm text-gray-500">Pengaduan yang Anda ajukan akan muncul di sini.</p>
+        </Card>
       </div>
     );
   }
@@ -62,8 +71,8 @@ const ComplaintHistory: React.FC<ComplaintHistoryProps> = ({
               }`}>
                 {complaint.status === 'pending' ? 'Menunggu' :
                  complaint.status === 'in_progress' ? 'Diproses' :
-                 complaint.status === 'resolved' ? 'Selesai' : 'Lainnya'
-                }
+                 complaint.status === 'resolved' ? 'Selesai' : 
+                 complaint.status}
               </span>
             </div>
             <p className="text-sm text-gray-600 mb-1">{complaint.category}</p>

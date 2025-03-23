@@ -3,16 +3,27 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { AlertCircle, Loader2 } from 'lucide-react';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
 import PengaduanHeader from '@/components/pengaduan/PengaduanHeader';
 import QuickActions from '@/components/pengaduan/QuickActions';
 import ComplaintsList from '@/components/pengaduan/ComplaintsList';
 import PengaduanBottomNavigation from '@/components/pengaduan/PengaduanBottomNavigation';
 import ComplaintSubmissionForm from '@/components/pengaduan/ComplaintSubmissionForm';
 import ComplaintHistory from '@/components/pengaduan/ComplaintHistory';
-import { Loader2 } from 'lucide-react';
+
+interface Complaint {
+  id: string;
+  title: string;
+  category: string;
+  status: string;
+  created_at: string;
+  description: string;
+}
 
 const Pengaduan: React.FC = () => {
-  const [complaints, setComplaints] = useState<any[]>([]);
+  const [complaints, setComplaints] = useState<Complaint[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentView, setCurrentView] = useState<'list' | 'form' | 'history'>('list');
@@ -31,6 +42,7 @@ const Pengaduan: React.FC = () => {
       const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
       
       if (sessionError) {
+        console.error('Session error:', sessionError);
         throw new Error('Sesi pengguna tidak ditemukan. Silakan masuk kembali.');
       }
       
@@ -49,6 +61,7 @@ const Pengaduan: React.FC = () => {
         .order('created_at', { ascending: false });
       
       if (complaintsError) {
+        console.error('Error fetching complaints:', complaintsError);
         throw complaintsError;
       }
       
@@ -80,6 +93,59 @@ const Pengaduan: React.FC = () => {
     toast.success('Pengaduan berhasil dikirim');
   };
 
+  const renderContent = () => {
+    if (currentView === 'list') {
+      return (
+        <>
+          <QuickActions 
+            onNewComplaint={handleNewComplaint} 
+            onHistory={handleViewHistory} 
+          />
+          
+          {isLoading ? (
+            <div className="flex flex-col justify-center items-center py-10 px-4">
+              <Loader2 className="h-8 w-8 animate-spin text-teal mb-2" />
+              <span className="text-gray-600">Memuat data pengaduan...</span>
+            </div>
+          ) : error ? (
+            <div className="p-4">
+              <Alert variant="destructive" className="mb-4">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>Error</AlertTitle>
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+              <Button 
+                variant="outline" 
+                onClick={fetchComplaints}
+                className="w-full mt-2"
+              >
+                Coba Lagi
+              </Button>
+            </div>
+          ) : (
+            <ComplaintsList 
+              complaints={complaints} 
+              isLoading={isLoading}
+              loadError={error}
+              onRetry={fetchComplaints}
+            />
+          )}
+        </>
+      );
+    } else if (currentView === 'form') {
+      return <ComplaintSubmissionForm onSubmitSuccess={handleComplaintSubmitted} />;
+    } else {
+      return (
+        <ComplaintHistory 
+          complaints={complaints} 
+          isLoading={isLoading} 
+          error={error} 
+          onRetry={fetchComplaints} 
+        />
+      );
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 pb-16">
       <PengaduanHeader 
@@ -94,56 +160,7 @@ const Pengaduan: React.FC = () => {
         onBackClick={handleBack}
       />
 
-      {currentView === 'list' && (
-        <>
-          <QuickActions 
-            onNewComplaint={handleNewComplaint} 
-            onHistory={handleViewHistory} 
-          />
-          
-          {isLoading ? (
-            <div className="flex justify-center items-center py-10">
-              <Loader2 className="h-8 w-8 animate-spin text-teal" />
-              <span className="ml-2 text-gray-600">Memuat data...</span>
-            </div>
-          ) : error ? (
-            <div className="bg-red-50 border border-red-200 rounded-lg mx-4 my-6 p-4 text-center">
-              <p className="text-red-600">{error}</p>
-              <button 
-                className="mt-2 px-4 py-2 bg-teal text-white rounded-lg"
-                onClick={fetchComplaints}
-              >
-                Coba Lagi
-              </button>
-            </div>
-          ) : complaints.length === 0 ? (
-            <div className="bg-white shadow rounded-lg mx-4 my-6 p-4 text-center">
-              <p className="text-gray-600">Belum ada pengaduan yang dibuat.</p>
-              <button 
-                className="mt-2 px-4 py-2 bg-teal text-white rounded-lg"
-                onClick={handleNewComplaint}
-              >
-                Buat Pengaduan Baru
-              </button>
-            </div>
-          ) : (
-            <ComplaintsList 
-              complaints={complaints} 
-              isLoading={isLoading}
-              loadError={error}
-              onRetry={fetchComplaints}
-            />
-          )}
-        </>
-      )}
-
-      {currentView === 'form' && (
-        <ComplaintSubmissionForm onSubmitSuccess={handleComplaintSubmitted} />
-      )}
-
-      {currentView === 'history' && (
-        <ComplaintHistory complaints={complaints} isLoading={isLoading} error={error} onRetry={fetchComplaints} />
-      )}
+      {renderContent()}
 
       <PengaduanBottomNavigation />
     </div>

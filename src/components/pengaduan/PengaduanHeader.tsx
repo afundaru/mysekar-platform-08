@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Bell, Settings } from 'lucide-react';
 
 interface PengaduanHeaderProps {
   title: string;
@@ -20,6 +20,7 @@ const PengaduanHeader: React.FC<PengaduanHeaderProps> = ({
           <button 
             onClick={onBackClick}
             className="mr-2 rounded-full p-1 hover:bg-gray-100"
+            aria-label="Kembali"
           >
             <ArrowLeft className="h-5 w-5" />
           </button>
@@ -27,11 +28,11 @@ const PengaduanHeader: React.FC<PengaduanHeaderProps> = ({
         <h1 className="text-lg font-semibold">{title}</h1>
       </div>
       <div className="flex items-center space-x-4">
-        <button className="text-gray-600">
-          <i className="fa-regular fa-bell text-xl"></i>
+        <button className="text-gray-600" aria-label="Notifikasi">
+          <Bell className="h-5 w-5" />
         </button>
-        <button className="text-gray-600">
-          <i className="fa-solid fa-gear text-xl"></i>
+        <button className="text-gray-600" aria-label="Pengaturan">
+          <Settings className="h-5 w-5" />
         </button>
       </div>
     </header>
