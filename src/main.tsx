@@ -1,4 +1,3 @@
-
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
@@ -22,13 +21,13 @@ const root = ReactDOM.createRoot(rootElement);
 // Proper provider nesting to ensure React context works correctly
 root.render(
   <React.StrictMode>
-    <Router>
-      <TooltipProvider>
+    <TooltipProvider>
+      <Router>
         <AuthProvider>
           <App />
         </AuthProvider>
-      </TooltipProvider>
-    </Router>
+      </Router>
+    </TooltipProvider>
   </React.StrictMode>
 );
 
