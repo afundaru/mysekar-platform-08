@@ -1,15 +1,9 @@
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
 
 const HeroBanner: React.FC = () => {
-  const navigate = useNavigate();
-
-  const handleJoinNow = () => {
-    navigate('/register');
-  };
-
   return (
     <section className="relative h-[320px] md:h-[480px] lg:h-[560px] overflow-hidden animate-fade-in">
       <div className="absolute inset-0 grid grid-cols-1 md:grid-cols-2 h-full">
@@ -35,10 +29,10 @@ const HeroBanner: React.FC = () => {
           Platform digital terpadu untuk anggota serikat pekerja SEKAR. Bersama kita maju, bersatu dalam teknologi.
         </p>
         <Button 
-          onClick={handleJoinNow}
+          asChild
           className="bg-teal hover:bg-teal/90 text-white px-6 py-2 md:px-8 md:py-3 rounded-full hover:bg-opacity-90 transition-all duration-300 shadow-md hover:shadow-lg animate-slide-up animate-delay-200 transform hover:-translate-y-1"
         >
-          Gabung Sekarang
+          <Link to="/register">Gabung Sekarang</Link>
         </Button>
       </div>
     </section>
