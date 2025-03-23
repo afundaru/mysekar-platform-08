@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
-import { AlertCircle, CheckCircle2, WifiOff } from "lucide-react";
+import { AlertCircle, CheckCircle2, WifiOff, RefreshCw } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const AddAdmin: React.FC = () => {
   const { user, checkIsAdmin } = useAuth();
@@ -15,6 +16,7 @@ const AddAdmin: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
+  const [adminError, setAdminError] = useState<string | null>(null);
 
   // Listen for online/offline events
   useEffect(() => {
@@ -78,6 +80,7 @@ const AddAdmin: React.FC = () => {
     setLoading(true);
     setError(null);
     setSuccess(null);
+    setAdminError(null);
     
     try {
       console.log("Menambahkan user sebagai admin:", user.id);
@@ -100,8 +103,7 @@ const AddAdmin: React.FC = () => {
           // Network error
           throw new Error('Gagal terhubung ke server. Periksa koneksi internet Anda.');
         } else {
-          setError(`Gagal menambahkan admin: ${insertError.message}`);
-          toast.error(`Gagal menambahkan admin: ${insertError.message}`);
+          throw new Error(`Gagal menambahkan admin: ${insertError.message}`);
         }
       } else {
         setSuccess('Anda berhasil menjadi admin!');
@@ -112,7 +114,7 @@ const AddAdmin: React.FC = () => {
       }
     } catch (err: any) {
       console.error('Error making admin:', err);
-      setError(`Terjadi kesalahan: ${err.message || 'Unknown error'}`);
+      setAdminError(`Terjadi kesalahan saat menambahkan admin: ${err.message || 'Unknown error'}`);
       toast.error('Terjadi kesalahan saat menambahkan admin');
       
       // Set fallback admin status in development
@@ -188,6 +190,7 @@ const AddAdmin: React.FC = () => {
                     className="mt-2"
                     disabled={isOffline}
                   >
+                    <RefreshCw className="mr-2 h-4 w-4" />
                     Coba Lagi
                   </Button>
                 )}
@@ -202,6 +205,25 @@ const AddAdmin: React.FC = () => {
             </div>
           )}
           
+          {adminError && (
+            <Alert variant="destructive" className="mb-4">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                {adminError}
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={makeAdmin} 
+                  className="mt-2 ml-2"
+                  disabled={isOffline || loading}
+                >
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  Coba Lagi
+                </Button>
+              </AlertDescription>
+            </Alert>
+          )}
+          
           <p className="mb-4">
             {isAdmin 
               ? 'Anda memiliki akses admin. Anda dapat mengelola aplikasi dan pengguna lain.'
@@ -214,7 +236,12 @@ const AddAdmin: React.FC = () => {
               disabled={loading || isOffline}
               className="bg-teal hover:bg-teal/90"
             >
-              {loading ? 'Memproses...' : 'Jadikan Saya Admin'}
+              {loading ? (
+                <>
+                  <span className="mr-2">Memproses...</span>
+                  <div className="animate-spin h-4 w-4 border-2 border-white rounded-full border-t-transparent"></div>
+                </>
+              ) : 'Jadikan Saya Admin'}
             </Button>
           )}
         </CardContent>
