@@ -19,7 +19,6 @@ interface ProfileAvatarProps {
 }
 
 const ProfileAvatar: React.FC<ProfileAvatarProps> = ({ user, avatarUrl, setAvatarUrl }) => {
-  // Ensure user exists before using hooks
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -116,6 +115,7 @@ const ProfileAvatar: React.FC<ProfileAvatarProps> = ({ user, avatarUrl, setAvata
         <AvatarFallback>{memberData?.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}</AvatarFallback>
       </Avatar>
       
+      {/* Moved the DropdownMenu outside of any conditional rendering to ensure React hooks order is preserved */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button 

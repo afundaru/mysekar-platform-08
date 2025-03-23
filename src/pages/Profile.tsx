@@ -6,8 +6,8 @@ import { ErrorBoundary } from 'react-error-boundary';
 import DashboardHeader from '@/components/DashboardHeader';
 import MembershipCard from '@/components/MembershipCard';
 
-// Error fallback component
-const ErrorFallback = ({ error, resetErrorBoundary }) => {
+// Error fallback component with proper typing
+const ErrorFallback = ({ error, resetErrorBoundary }: { error: Error; resetErrorBoundary: () => void }) => {
   return (
     <div className="p-4 text-center">
       <h3 className="text-xl font-bold text-red-500 mb-4">Something went wrong</h3>

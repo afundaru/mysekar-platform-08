@@ -4,7 +4,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from '@/contexts/AuthContext';
 import { ErrorBoundary } from 'react-error-boundary';
 
-const ErrorFallback = ({ error }) => (
+// Add proper typing to the ErrorFallback component
+const ErrorFallback = ({ error }: { error: Error }) => (
   <div className="p-4 text-red-500 text-sm">
     <p>Failed to load membership card: {error.message}</p>
   </div>
