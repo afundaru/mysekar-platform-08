@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Routes, Route, Link, Navigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
@@ -14,7 +13,7 @@ import {
   SidebarProvider,
 } from "@/components/ui/sidebar";
 import { LayoutDashboard, Users, MessageSquare, Flag, Gavel, LogOut } from "lucide-react";
-import { SignOutButton } from "@/components/auth/SignOutButton";
+import SignOutButton from "@/components/auth/SignOutButton";
 
 const DashboardAdmin = () => {
   return (
@@ -171,7 +170,6 @@ const AdminApp = () => {
   );
 };
 
-// Admin subpages
 const Keanggotaan = () => {
   return (
     <div className="space-y-4">
