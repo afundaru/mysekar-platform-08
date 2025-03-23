@@ -1,13 +1,18 @@
 
+"use client"
+
 import * as React from "react"
 import * as TooltipPrimitive from "@radix-ui/react-tooltip"
 
 import { cn } from "@/lib/utils"
 
-// Explicitly use the Provider component
-const TooltipProvider = ({ children, ...props }: TooltipPrimitive.TooltipProviderProps) => {
-  return <TooltipPrimitive.Provider {...props}>{children}</TooltipPrimitive.Provider>
-}
+// Explicitly define TooltipProvider as a functional component with proper React import
+const TooltipProvider = React.forwardRef<
+  React.ElementRef<typeof TooltipPrimitive.Provider>,
+  React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Provider>
+>(({ ...props }, ref) => (
+  <TooltipPrimitive.Provider ref={ref} {...props} />
+))
 TooltipProvider.displayName = "TooltipProvider"
 
 const Tooltip = TooltipPrimitive.Root
