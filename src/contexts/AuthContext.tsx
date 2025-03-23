@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useState, useEffect, useMemo, useCallback, Suspense } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -157,7 +157,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     );
   }
 
-  // Avoid nested Suspense for better performance (remove it if it causes issues)
+  // Replace Suspense with simple conditional rendering
   return (
     <AuthContext.Provider value={value}>
       {loading ? (

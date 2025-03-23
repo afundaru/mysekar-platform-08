@@ -16,8 +16,12 @@ if (!rootElement) {
 // Create root outside of render to help with debugging
 const root = ReactDOM.createRoot(rootElement);
 
-// Mount the application - removed StrictMode since it's now in App.tsx
-root.render(<App />)
+// Mount the application without StrictMode (it's now in App.tsx)
+root.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+)
 
 // Register service worker for offline support
 serviceWorkerRegistration.register({
