@@ -10,9 +10,7 @@ const Admin = () => {
   
   return (
     <AdminRoute>
-      <Routes>
-        <Route path="/*" element={<AdminApp />} />
-      </Routes>
+      <AdminApp />
     </AdminRoute>
   );
 };

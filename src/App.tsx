@@ -74,7 +74,7 @@ const App = () => (
               </ProtectedRoute>
             } />
             
-            {/* Admin Routes - Pastikan rute admin benar */}
+            {/* Admin Routes - Fixed the routing path */}
             <Route path="/admin/*" element={<Admin />} />
             
             {/* Catch-all route */}

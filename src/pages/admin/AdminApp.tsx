@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Routes, Route, Link, Navigate } from "react-router-dom";
+import { Routes, Route, Link, Navigate, useLocation } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -222,8 +222,10 @@ const Konsultasi = () => {
 };
 
 const AdminApp = () => {
+  const location = useLocation();
+  
   // Add console.log to help debug
-  console.log("AdminApp rendered, pathname:", window.location.pathname);
+  console.log("AdminApp rendered, pathname:", location.pathname);
   
   return (
     <SidebarProvider>
@@ -233,14 +235,13 @@ const AdminApp = () => {
           <div className="bg-teal h-2" />
           <main className="p-4">
             <Routes>
-              <Route index element={<DashboardAdmin />} />
-              <Route path="keanggotaan" element={<Keanggotaan />} />
-              <Route path="forum" element={<Forum />} />
-              <Route path="pengaduan" element={<Pengaduan />} />
-              <Route path="konsultasi" element={<Konsultasi />} />
-              <Route path="add-admin" element={<AddAdmin />} />
-              {/* Fix redirect path - remove leading slash */}
-              <Route path="*" element={<Navigate to="" replace />} />
+              <Route path="/" element={<DashboardAdmin />} />
+              <Route path="/keanggotaan" element={<Keanggotaan />} />
+              <Route path="/forum" element={<Forum />} />
+              <Route path="/pengaduan" element={<Pengaduan />} />
+              <Route path="/konsultasi" element={<Konsultasi />} />
+              <Route path="/add-admin" element={<AddAdmin />} />
+              <Route path="*" element={<Navigate to="/admin" replace />} />
             </Routes>
           </main>
         </div>
