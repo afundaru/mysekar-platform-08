@@ -138,10 +138,7 @@ const AdminSidebar = () => {
         </SidebarMenu>
       </SidebarContent>
       <SidebarFooter className="border-t p-4">
-        <SignOutButton className="w-full flex items-center gap-2 justify-center">
-          <LogOut className="h-4 w-4" />
-          <span>Keluar</span>
-        </SignOutButton>
+        <SignOutButton className="w-full flex items-center gap-2 justify-center" />
       </SidebarFooter>
     </Sidebar>
   );
