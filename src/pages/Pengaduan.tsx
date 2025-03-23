@@ -127,7 +127,12 @@ const Pengaduan: React.FC = () => {
               </button>
             </div>
           ) : (
-            <ComplaintsList complaints={complaints} />
+            <ComplaintsList 
+              complaints={complaints} 
+              isLoading={isLoading}
+              loadError={error}
+              onRetry={fetchComplaints}
+            />
           )}
         </>
       )}

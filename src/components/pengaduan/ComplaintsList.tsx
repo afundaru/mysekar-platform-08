@@ -15,16 +15,16 @@ interface Complaint {
 
 interface ComplaintsListProps {
   complaints: Complaint[];
-  isLoading: boolean;
-  loadError: string | null;
-  onRetry: () => void;
+  isLoading?: boolean;
+  loadError?: string | null;
+  onRetry?: () => void;
 }
 
 const ComplaintsList: React.FC<ComplaintsListProps> = ({
   complaints,
-  isLoading,
-  loadError,
-  onRetry
+  isLoading = false,
+  loadError = null,
+  onRetry = () => {}
 }) => {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -36,7 +36,7 @@ const ComplaintsList: React.FC<ComplaintsListProps> = ({
   };
 
   return (
-    <div>
+    <div className="p-4">
       <div className="flex justify-between items-center mb-2">
         <h2 className="font-semibold text-lg">Riwayat Pengaduan</h2>
         {loadError && (

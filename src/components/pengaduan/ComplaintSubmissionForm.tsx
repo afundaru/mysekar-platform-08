@@ -13,13 +13,11 @@ import { toast } from 'sonner';
 const categories = ["Upah", "PHK", "Pelecehan", "Kondisi Kerja", "Lainnya"];
 
 interface ComplaintSubmissionFormProps {
-  userId: string | undefined;
-  onComplaintSubmitted: () => void;
+  onSubmitSuccess: () => void;
 }
 
 const ComplaintSubmissionForm: React.FC<ComplaintSubmissionFormProps> = ({
-  userId,
-  onComplaintSubmitted
+  onSubmitSuccess
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>(categories[0]);
   const [title, setTitle] = useState<string>("");
@@ -35,11 +33,6 @@ const ComplaintSubmissionForm: React.FC<ComplaintSubmissionFormProps> = ({
   };
 
   const handleSubmit = async () => {
-    if (!userId) {
-      toast.error("Anda harus login terlebih dahulu");
-      return;
-    }
-
     if (!title || !description) {
       toast.error("Judul dan deskripsi pengaduan wajib diisi");
       return;
@@ -48,6 +41,19 @@ const ComplaintSubmissionForm: React.FC<ComplaintSubmissionFormProps> = ({
     setIsSubmitting(true);
     
     try {
+      // Get user ID from session
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) {
+        throw new Error('Sesi pengguna tidak ditemukan. Silakan masuk kembali.');
+      }
+      
+      const userId = sessionData.session?.user.id;
+      if (!userId) {
+        toast.error("Anda harus login terlebih dahulu");
+        return;
+      }
+
       // Insert complaint record
       const { data: complaintData, error: complaintError } = await supabase
         .from('complaints')
@@ -57,6 +63,7 @@ const ComplaintSubmissionForm: React.FC<ComplaintSubmissionFormProps> = ({
           description,
           category: selectedCategory,
           is_anonymous: isAnonymous,
+          status: 'pending' // Default status for new complaints
         })
         .select('id')
         .single();
@@ -95,8 +102,6 @@ const ComplaintSubmissionForm: React.FC<ComplaintSubmissionFormProps> = ({
         }
       }
 
-      toast.success("Pengaduan berhasil dikirim");
-      
       // Reset form
       setTitle("");
       setDescription("");
@@ -104,7 +109,7 @@ const ComplaintSubmissionForm: React.FC<ComplaintSubmissionFormProps> = ({
       setIsAnonymous(false);
       
       // Notify parent component to refresh complaints list
-      onComplaintSubmitted();
+      onSubmitSuccess();
       
     } catch (error) {
       console.error('Error submitting complaint:', error);
@@ -115,7 +120,7 @@ const ComplaintSubmissionForm: React.FC<ComplaintSubmissionFormProps> = ({
   };
 
   return (
-    <div className="space-y-3">
+    <div className="p-4 space-y-3">
       <Select onValueChange={setSelectedCategory} defaultValue={selectedCategory}>
         <SelectTrigger>
           <SelectValue placeholder="Pilih Kategori" />
@@ -151,7 +156,7 @@ const ComplaintSubmissionForm: React.FC<ComplaintSubmissionFormProps> = ({
         <Checkbox 
           id="anonymous" 
           checked={isAnonymous} 
-          onCheckedChange={() => setIsAnonymous(!isAnonymous)} 
+          onCheckedChange={(checked) => setIsAnonymous(checked === true)} 
         />
         <Label htmlFor="anonymous" className="text-sm">Laporkan secara anonim</Label>
       </div>
