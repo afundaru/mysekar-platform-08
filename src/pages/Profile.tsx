@@ -5,7 +5,6 @@ import DashboardBottomNavigation from '@/components/DashboardBottomNavigation';
 import { ErrorBoundary } from 'react-error-boundary';
 import DashboardHeader from '@/components/DashboardHeader';
 import MembershipCard from '@/components/MembershipCard';
-import { BrowserRouter } from 'react-router-dom';
 
 // Error fallback component
 const ErrorFallback = ({ error, resetErrorBoundary }) => {
@@ -31,45 +30,42 @@ const LoadingFallback = () => (
 );
 
 const Profile = () => {
-  // We need to ensure Router context is available for components that use router hooks
   return (
-    <BrowserRouter>
-      <div className="min-h-screen bg-gray-50">
-        {/* Status Bar */}
-        <div className="bg-teal h-6"></div>
-        
-        {/* Header */}
-        <ErrorBoundary FallbackComponent={ErrorFallback}>
-          <DashboardHeader />
+    <div className="min-h-screen bg-gray-50">
+      {/* Status Bar */}
+      <div className="bg-teal h-6"></div>
+      
+      {/* Header */}
+      <ErrorBoundary FallbackComponent={ErrorFallback}>
+        <DashboardHeader />
+      </ErrorBoundary>
+      
+      {/* Main Content */}
+      <main className="p-4 pb-20">
+        <ErrorBoundary 
+          FallbackComponent={ErrorFallback}
+          onReset={() => window.location.reload()}
+        >
+          <Suspense fallback={<LoadingFallback />}>
+            <UserProfile />
+          </Suspense>
         </ErrorBoundary>
         
-        {/* Main Content */}
-        <main className="p-4 pb-20">
-          <ErrorBoundary 
-            FallbackComponent={ErrorFallback}
-            onReset={() => window.location.reload()}
-          >
+        {/* Membership Card */}
+        <div className="mt-6">
+          <ErrorBoundary FallbackComponent={ErrorFallback}>
             <Suspense fallback={<LoadingFallback />}>
-              <UserProfile />
+              <MembershipCard />
             </Suspense>
           </ErrorBoundary>
-          
-          {/* Membership Card */}
-          <div className="mt-6">
-            <ErrorBoundary FallbackComponent={ErrorFallback}>
-              <Suspense fallback={<LoadingFallback />}>
-                <MembershipCard />
-              </Suspense>
-            </ErrorBoundary>
-          </div>
-        </main>
-        
-        {/* Bottom Navigation */}
-        <ErrorBoundary FallbackComponent={ErrorFallback}>
-          <DashboardBottomNavigation />
-        </ErrorBoundary>
-      </div>
-    </BrowserRouter>
+        </div>
+      </main>
+      
+      {/* Bottom Navigation */}
+      <ErrorBoundary FallbackComponent={ErrorFallback}>
+        <DashboardBottomNavigation />
+      </ErrorBoundary>
+    </div>
   );
 };
 
