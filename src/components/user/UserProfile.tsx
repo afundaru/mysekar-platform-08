@@ -8,10 +8,26 @@ import { toast } from 'sonner';
 import ProfileHeader from './ProfileHeader';
 import PersonalInfo from './PersonalInfo';
 import MembershipInfo from './MembershipInfo';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const UserProfile: React.FC = () => {
-  // Move hooks to the top level of the component
+  // Early bail-out to check if we're in the proper context
+  // and render a minimal version if not
+  try {
+    // This will throw if RouterContext is not available
+    useLocation();
+  } catch (e) {
+    console.error("Router context not available", e);
+    return (
+      <div className="w-full max-w-md mx-auto p-4">
+        <div className="flex justify-center items-center h-48">
+          <p>Loading profile...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Now that we know RouterContext is available, we can use navigate
   const navigate = useNavigate();
   const { user, loading } = useAuth();
   const [editing, setEditing] = useState(false);

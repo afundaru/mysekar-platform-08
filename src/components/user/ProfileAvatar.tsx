@@ -20,6 +20,12 @@ interface ProfileAvatarProps {
 
 const ProfileAvatar: React.FC<ProfileAvatarProps> = ({ user, avatarUrl, setAvatarUrl }) => {
   // Ensure user exists before using hooks
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+  
+  // Guard for null user
   if (!user) {
     return (
       <div className="relative mr-4">
@@ -29,11 +35,6 @@ const ProfileAvatar: React.FC<ProfileAvatarProps> = ({ user, avatarUrl, setAvata
       </div>
     );
   }
-  
-  const [uploading, setUploading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const cameraInputRef = useRef<HTMLInputElement>(null);
   
   const memberData = user?.user_metadata || {};
   
