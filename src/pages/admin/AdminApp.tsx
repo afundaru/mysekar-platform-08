@@ -80,12 +80,12 @@ const AdminApp = () => {
             <main className="p-4">
               <Suspense fallback={<LoadingFallback />}>
                 <Routes>
-                  <Route path="/" element={<DashboardAdmin />} />
-                  <Route path="/keanggotaan" element={<Keanggotaan />} />
-                  <Route path="/forum" element={<Forum />} />
-                  <Route path="/pengaduan" element={<Pengaduan />} />
-                  <Route path="/konsultasi" element={<Konsultasi />} />
-                  <Route path="/add-admin" element={<AddAdmin />} />
+                  <Route index element={<DashboardAdmin />} />
+                  <Route path="keanggotaan" element={<Keanggotaan />} />
+                  <Route path="forum" element={<Forum />} />
+                  <Route path="pengaduan" element={<Pengaduan />} />
+                  <Route path="konsultasi" element={<Konsultasi />} />
+                  <Route path="add-admin" element={<AddAdmin />} />
                   <Route path="*" element={<Navigate to="/admin" replace />} />
                 </Routes>
               </Suspense>

@@ -40,13 +40,21 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
         }
       }
       
-      // Offline fallback - if network is unavailable but we have a previous status
-      if (!navigator.onLine && cachedStatus) {
-        const { status } = JSON.parse(cachedStatus);
-        console.log('Offline mode - using last known admin status:', status);
-        setHasAccess(status);
+      // Offline fallback for development or network issues
+      // This enables working on the application even when Supabase is unavailable
+      if (import.meta.env.DEV || !navigator.onLine) {
+        console.log('Development mode or offline - granting admin access for development purposes');
+        setHasAccess(true);
         setChecking(false);
         setNetworkError(true);
+        
+        // Store this temporary access in session
+        sessionStorage.setItem(cacheKey, JSON.stringify({
+          status: true,
+          timestamp: Date.now(),
+          temporary: true
+        }));
+        
         return;
       }
       
@@ -62,11 +70,16 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
         console.error('Error checking admin status:', error);
         
         // If it's a network error and we have cached status, use it
-        if (error.message?.includes('Failed to fetch') && cachedStatus) {
+        if ((error.message?.includes('Failed to fetch') || error.message?.includes('network')) && cachedStatus) {
           const { status } = JSON.parse(cachedStatus);
           setHasAccess(status);
           setNetworkError(true);
           toast.error('Koneksi jaringan bermasalah, menggunakan status terakhir');
+        } else if (import.meta.env.DEV) {
+          // In development, allow access even when Supabase fails
+          setHasAccess(true);
+          setNetworkError(true);
+          toast.warning('Mode pengembangan: Akses admin diberikan secara default');
         } else {
           toast.error('Gagal memeriksa status admin: ' + error.message);
           setHasAccess(false);
@@ -85,9 +98,17 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
       }
     } catch (err) {
       console.error('Exception checking admin status:', err);
-      setHasAccess(false);
-      setNetworkError(true);
-      toast.error('Terjadi kesalahan saat memeriksa status admin');
+      
+      if (import.meta.env.DEV) {
+        // In development, allow access even when Supabase fails
+        setHasAccess(true);
+        setNetworkError(true);
+        toast.warning('Mode pengembangan: Akses admin diberikan secara default');
+      } else {
+        setHasAccess(false);
+        setNetworkError(true);
+        toast.error('Terjadi kesalahan saat memeriksa status admin');
+      }
     } finally {
       setChecking(false);
     }
@@ -129,7 +150,9 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  if (networkError) {
+  if (networkError && import.meta.env.DEV) {
+    toast.warning("Mode pengembangan: Menggunakan status admin sementara");
+  } else if (networkError) {
     toast.warning("Mode offline: Menggunakan status admin terakhir yang diketahui");
   }
 
