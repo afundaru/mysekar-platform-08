@@ -3,30 +3,53 @@ import React, { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 interface AdminRouteProps {
   children: React.ReactNode;
 }
 
 const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
-  const { user, loading, isAdmin, checkIsAdmin } = useAuth();
+  const { user, loading } = useAuth();
   const location = useLocation();
   const [checking, setChecking] = useState(true);
   const [hasAccess, setHasAccess] = useState(false);
 
   useEffect(() => {
     const verifyAdminStatus = async () => {
-      if (user) {
-        const isUserAdmin = await checkIsAdmin();
-        setHasAccess(isUserAdmin);
+      if (!user) {
+        setChecking(false);
+        return;
       }
-      setChecking(false);
+
+      try {
+        // Langsung periksa ke database untuk status admin terbaru
+        const { data, error } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', user.id)
+          .eq('role', 'admin')
+          .maybeSingle();
+        
+        if (error) {
+          console.error('Error checking admin status:', error);
+          toast.error('Gagal memeriksa status admin: ' + error.message);
+          setHasAccess(false);
+        } else {
+          setHasAccess(!!data); // true jika data ditemukan, false jika tidak
+        }
+      } catch (err) {
+        console.error('Exception checking admin status:', err);
+        setHasAccess(false);
+      } finally {
+        setChecking(false);
+      }
     };
 
     if (!loading) {
       verifyAdminStatus();
     }
-  }, [user, loading, checkIsAdmin]);
+  }, [user, loading]);
 
   // Jika masih loading atau sedang memeriksa status admin, tampilkan loading
   if (loading || checking) {
@@ -44,7 +67,7 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
   }
 
   // Jika bukan admin, redirect ke dashboard dengan pesan error
-  if (!isAdmin) {
+  if (!hasAccess) {
     toast.error("Anda tidak memiliki akses ke halaman admin");
     return <Navigate to="/dashboard" state={{ from: location }} replace />;
   }
