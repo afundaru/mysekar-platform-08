@@ -1,53 +1,40 @@
 
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { MessageSquare, Megaphone, FilePen, Bot, MessageCircle, HelpCircle } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Button } from './ui/button';
+import { useAuth } from '@/contexts/AuthContext';
 
-const MainNavigation: React.FC = () => {
-  const navigate = useNavigate();
-  
+const MainNavigation = () => {
+  const { user } = useAuth();
+
   return (
-    <section className="px-4 py-6">
-      <h2 className="text-lg font-semibold mb-4">Menu Utama</h2>
-      <div className="grid grid-cols-3 gap-4">
-        <NavItem 
-          icon={<MessageSquare className="h-6 w-6" />} 
-          label="Forum Diskusi" 
-          onClick={() => navigate('/forum-diskusi')}
-        />
-        <NavItem icon={<Megaphone className="h-6 w-6" />} label="Pengumuman" />
-        <NavItem 
-          icon={<FilePen className="h-6 w-6" />} 
-          label="Pengaduan" 
-          onClick={() => navigate('/pengaduan')}
-        />
-        <NavItem 
-          icon={<Bot className="h-6 w-6" />} 
-          label="Konsultasi" 
-          onClick={() => navigate('/konsultasi-hukum')}
-        />
-        <NavItem icon={<MessageCircle className="h-6 w-6" />} label="Live Chat" />
-        <NavItem icon={<HelpCircle className="h-6 w-6" />} label="Bantuan" />
+    <nav className="bg-white py-4 px-6 flex justify-between items-center shadow-sm">
+      <div className="flex items-center">
+        <Link to="/" className="text-xl font-bold text-teal mr-8">MySEKAR</Link>
+        <div className="hidden md:flex space-x-4">
+          <Link to="/" className="text-gray-600 hover:text-teal hover:underline hover:underline-offset-4">Beranda</Link>
+          <Link to="/forum-diskusi" className="text-gray-600 hover:text-teal hover:underline hover:underline-offset-4">Forum</Link>
+          <Link to="/pengaduan" className="text-gray-600 hover:text-teal hover:underline hover:underline-offset-4">Pengaduan</Link>
+          <Link to="/konsultasi-hukum" className="text-gray-600 hover:text-teal hover:underline hover:underline-offset-4">Konsultasi</Link>
+          {user && <Link to="/admin" className="text-gray-600 hover:text-teal hover:underline hover:underline-offset-4">Admin</Link>}
+        </div>
       </div>
-    </section>
-  );
-};
-
-interface NavItemProps {
-  icon: React.ReactNode;
-  label: string;
-  onClick?: () => void;
-}
-
-const NavItem: React.FC<NavItemProps> = ({ icon, label, onClick }) => {
-  return (
-    <div 
-      className="bg-white p-4 rounded-lg shadow text-center cursor-pointer hover:shadow-md transition-shadow"
-      onClick={onClick}
-    >
-      <div className="text-teal mb-2 flex justify-center">{icon}</div>
-      <h3 className="text-sm">{label}</h3>
-    </div>
+      <div className="flex items-center space-x-4">
+        {user ? (
+          <Link to="/dashboard">
+            <Button variant="outline">Dashboard</Button>
+          </Link>
+        ) : (
+          <>
+            <Link to="/login">
+              <Button variant="outline">Masuk</Button>
+            </Link>
+            <Link to="/register" className="hidden md:block">
+              <Button>Daftar</Button>
+            </Link>
+          </>
+        )}
+      </div>
+    </nav>
   );
 };
 

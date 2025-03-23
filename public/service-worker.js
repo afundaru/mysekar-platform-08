@@ -15,7 +15,12 @@ const urlsToCache = [
   '/konsultasi-hukum',
   '/pengaduan',
   '/profile',
-  '/forum-diskusi'
+  '/forum-diskusi',
+  '/admin',
+  '/admin/keanggotaan',
+  '/admin/forum',
+  '/admin/pengaduan',
+  '/admin/konsultasi'
 ];
 
 // Install a service worker

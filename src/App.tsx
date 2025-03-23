@@ -19,6 +19,7 @@ import Pengaduan from "./pages/Pengaduan";
 import Profile from "./pages/Profile";
 import ForumDiskusi from "./pages/ForumDiskusi";
 import NotFound from "./pages/NotFound";
+import Admin from "./pages/admin";
 
 const queryClient = new QueryClient();
 
@@ -72,6 +73,9 @@ const App = () => (
                 <ForumDiskusi />
               </ProtectedRoute>
             } />
+            
+            {/* Admin Routes */}
+            <Route path="/admin/*" element={<Admin />} />
             
             {/* Catch-all route */}
             <Route path="*" element={<NotFound />} />
