@@ -21,7 +21,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | null>(null);
 
 // Export the AuthProvider component
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
@@ -157,14 +157,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     );
   }
 
-  // Replace Suspense with simple conditional rendering
   return (
     <AuthContext.Provider value={value}>
-      {loading ? (
-        <p className="text-center p-4">Loading authentication...</p>
-      ) : (
-        children
-      )}
+      {children}
     </AuthContext.Provider>
   );
 };
