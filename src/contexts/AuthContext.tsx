@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -16,7 +17,7 @@ interface AuthContextType {
   checkIsAdmin: () => Promise<boolean>;
 }
 
-// Create the context with default values to avoid null context errors
+// Create context with meaningful default values
 const AuthContext = createContext<AuthContextType>({
   session: null,
   user: null,
@@ -184,7 +185,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   // Memoize context value to prevent unnecessary rerenders
-  const value = useMemo(() => ({
+  const contextValue = useMemo(() => ({
     session,
     user,
     loading,
@@ -218,7 +219,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }
 
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   );
