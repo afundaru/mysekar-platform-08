@@ -3,6 +3,7 @@ import React from 'react';
 import { BadgeCheck } from 'lucide-react';
 import { Card, CardContent } from "@/components/ui/card";
 import ProfileAvatar from './ProfileAvatar';
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface ProfileHeaderProps {
   user: any;
@@ -11,6 +12,22 @@ interface ProfileHeaderProps {
 }
 
 const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user, avatarUrl, setAvatarUrl }) => {
+  if (!user) {
+    return (
+      <Card className="mb-6">
+        <CardContent className="pt-6">
+          <div className="flex items-center">
+            <Skeleton className="h-16 w-16 rounded-full mr-4" />
+            <div>
+              <Skeleton className="h-5 w-32 mb-2" />
+              <Skeleton className="h-4 w-24" />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+  
   const memberData = user?.user_metadata || {};
   
   return (

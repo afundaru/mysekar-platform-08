@@ -5,9 +5,11 @@ import DashboardBottomNavigation from '@/components/DashboardBottomNavigation';
 import { ErrorBoundary } from 'react-error-boundary';
 import DashboardHeader from '@/components/DashboardHeader';
 import MembershipCard from '@/components/MembershipCard';
+import { Skeleton } from "@/components/ui/skeleton";
 
 // Error fallback component with proper typing
 const ErrorFallback = ({ error, resetErrorBoundary }: { error: Error; resetErrorBoundary: () => void }) => {
+  console.error("Error in Profile component:", error);
   return (
     <div className="p-4 text-center">
       <h3 className="text-xl font-bold text-red-500 mb-4">Something went wrong</h3>
@@ -24,8 +26,10 @@ const ErrorFallback = ({ error, resetErrorBoundary }: { error: Error; resetError
 
 // Loading fallback
 const LoadingFallback = () => (
-  <div className="p-4 flex justify-center">
-    <div className="w-8 h-8 border-4 border-teal border-t-transparent rounded-full animate-spin"></div>
+  <div className="p-4 space-y-6">
+    <Skeleton className="h-24 w-full rounded-md" />
+    <Skeleton className="h-48 w-full rounded-md" />
+    <Skeleton className="h-48 w-full rounded-md" />
   </div>
 );
 

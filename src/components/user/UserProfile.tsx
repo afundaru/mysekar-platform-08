@@ -9,6 +9,7 @@ import ProfileHeader from './ProfileHeader';
 import PersonalInfo from './PersonalInfo';
 import MembershipInfo from './MembershipInfo';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { Skeleton } from "@/components/ui/skeleton";
 
 const UserProfile: React.FC = () => {
   // Move all hook calls to the top of the component function
@@ -19,6 +20,7 @@ const UserProfile: React.FC = () => {
   const [editing, setEditing] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isPageLoading, setIsPageLoading] = useState(true);
   
   console.log("UserProfile rendering with router context:", { 
     hasNavigate: !!navigate,
@@ -40,6 +42,12 @@ const UserProfile: React.FC = () => {
     if (user?.user_metadata?.avatar_url) {
       setAvatarUrl(user.user_metadata.avatar_url);
     }
+    // Add a slight delay to ensure all data is loaded
+    const timer = setTimeout(() => {
+      setIsPageLoading(false);
+    }, 500);
+    
+    return () => clearTimeout(timer);
   }, [user]);
   
   // Handle offline state
@@ -60,12 +68,19 @@ const UserProfile: React.FC = () => {
   }, []);
   
   // Separate the rendering logic based on state
-  if (loading) {
+  if (loading || isPageLoading) {
     return (
       <div className="w-full max-w-md mx-auto p-4">
-        <div className="flex justify-center items-center h-48">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal"></div>
-          <p className="ml-2">Memuat data...</p>
+        <div className="flex items-center mb-6">
+          <Button variant="ghost" size="icon" className="mr-2" disabled>
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <h2 className="text-xl font-bold">Profil Anggota</h2>
+        </div>
+        <div className="space-y-6">
+          <Skeleton className="h-24 w-full rounded-md" />
+          <Skeleton className="h-48 w-full rounded-md" />
+          <Skeleton className="h-48 w-full rounded-md" />
         </div>
       </div>
     );

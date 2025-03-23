@@ -11,6 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface ProfileAvatarProps {
   user: any;
@@ -84,6 +85,15 @@ const ProfileAvatar: React.FC<ProfileAvatarProps> = ({ user, avatarUrl, setAvata
   
   // Fallback avatar URL
   const fallbackAvatarUrl = "https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-1.jpg";
+  
+  // If no user, render a skeleton
+  if (!user) {
+    return (
+      <div className="relative mr-4">
+        <Skeleton className="h-16 w-16 rounded-full" />
+      </div>
+    );
+  }
   
   // Safe access to user metadata
   const memberData = user?.user_metadata || {};
