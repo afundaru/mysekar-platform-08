@@ -72,9 +72,9 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
       }
       
       try {
-        // Add a timeout to prevent UI freezing
+        // Reduced timeout to prevent UI freezing (from 3000ms to 2000ms)
         const timeoutPromise = new Promise<{data: null, error: Error}>((_, reject) => {
-          setTimeout(() => reject(new Error('Request timeout')), 3000);
+          setTimeout(() => reject(new Error('Request timeout')), 2000);
         });
         
         const fetchPromise = supabase
@@ -151,9 +151,14 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
   }, [user, location.pathname]);
 
   useEffect(() => {
-    if (!loading) {
-      verifyAdminStatus();
-    }
+    // Add a short delay to avoid immediate checking which might cause UI freezing
+    const timer = setTimeout(() => {
+      if (!loading) {
+        verifyAdminStatus();
+      }
+    }, 100);
+    
+    return () => clearTimeout(timer);
   }, [loading, verifyAdminStatus]);
 
   // Add event listeners for online/offline status
@@ -164,12 +169,17 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
       verifyAdminStatus();
     };
 
+    const handleOffline = () => {
+      console.log('App is offline');
+      setNetworkError(true);
+    };
+
     window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', () => setNetworkError(true));
+    window.addEventListener('offline', handleOffline);
 
     return () => {
       window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', () => setNetworkError(true));
+      window.removeEventListener('offline', handleOffline);
     };
   }, [verifyAdminStatus]);
 

@@ -1,11 +1,13 @@
 
-import React, { Suspense } from 'react';
-import UserProfile from '@/components/user/UserProfile';
-import DashboardBottomNavigation from '@/components/DashboardBottomNavigation';
+import React, { Suspense, lazy } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import DashboardHeader from '@/components/DashboardHeader';
 import MembershipCard from '@/components/MembershipCard';
 import { Skeleton } from "@/components/ui/skeleton";
+import DashboardBottomNavigation from '@/components/DashboardBottomNavigation';
+
+// Lazy load UserProfile component
+const UserProfile = lazy(() => import('@/components/user/UserProfile'));
 
 // Error fallback component with proper typing
 const ErrorFallback = ({ error, resetErrorBoundary }: { error: Error; resetErrorBoundary: () => void }) => {
