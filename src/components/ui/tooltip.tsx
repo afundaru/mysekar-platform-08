@@ -6,9 +6,7 @@ import * as TooltipPrimitive from "@radix-ui/react-tooltip"
 
 import { cn } from "@/lib/utils"
 
-// Define TooltipProvider correctly - it doesn't accept a ref
-const TooltipProvider = TooltipPrimitive.Provider;
-TooltipProvider.displayName = "TooltipProvider"
+const TooltipProvider = TooltipPrimitive.Provider
 
 const Tooltip = TooltipPrimitive.Root
 

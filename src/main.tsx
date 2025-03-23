@@ -19,16 +19,16 @@ if (!rootElement) {
 // Create root outside of render to help with debugging
 const root = ReactDOM.createRoot(rootElement);
 
-// Fix: Restructure providers to ensure they are properly nested
+// Fix proper React context provider hierarchy
 root.render(
   <React.StrictMode>
-    <Router>
-      <TooltipProvider>
+    <TooltipProvider>
+      <Router>
         <AuthProvider>
           <App />
         </AuthProvider>
-      </TooltipProvider>
-    </Router>
+      </Router>
+    </TooltipProvider>
   </React.StrictMode>
 );
 
