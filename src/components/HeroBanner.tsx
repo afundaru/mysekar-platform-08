@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
 
 const HeroBanner: React.FC = () => {
   return (
@@ -29,10 +28,10 @@ const HeroBanner: React.FC = () => {
           Platform digital terpadu untuk anggota serikat pekerja SEKAR. Bersama kita maju, bersatu dalam teknologi.
         </p>
         <Button 
-          asChild
           className="bg-teal hover:bg-teal/90 text-white px-6 py-2 md:px-8 md:py-3 rounded-full hover:bg-opacity-90 transition-all duration-300 shadow-md hover:shadow-lg animate-slide-up animate-delay-200 transform hover:-translate-y-1"
+          onClick={() => window.location.href = '/register'}
         >
-          <Link to="/register">Gabung Sekarang</Link>
+          Gabung Sekarang
         </Button>
       </div>
     </section>
