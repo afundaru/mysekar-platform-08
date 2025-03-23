@@ -35,8 +35,10 @@ const Index: React.FC = () => {
         <Statistics />
       </main>
       
-      {/* Bottom Navigation - Wrapped in a div to ensure it's only rendered after routing context is available */}
-      <BottomNavigation />
+      {/* Bottom Navigation - Fixed component that doesn't rely on React Router context directly */}
+      <div className="fixed bottom-0 left-0 w-full">
+        <BottomNavigation />
+      </div>
     </div>
   );
 };
