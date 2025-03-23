@@ -2,6 +2,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'sonner';
+import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from '@/pages/Index';
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
@@ -24,66 +25,69 @@ import AnnouncementsList from '@/pages/AnnouncementsList';
 
 function App() {
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <div className="App">
-          <Toaster />
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/announcements" element={<AnnouncementsList />} />
-            <Route path="/announcements/:id" element={<AnnouncementDetails />} />
-            
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/otp-verification" element={<OtpVerification />} />
-            <Route path="/registration-success" element={<RegistrationSuccess />} />
-            
-            <Route path="/dashboard" element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            } />
-            {/* Remove the Router from Profile.tsx since it's already wrapped here */}
-            <Route path="/profile" element={
-              <ProtectedRoute>
-                <Profile />
-              </ProtectedRoute>
-            } />
-            <Route path="/forum" element={
-              <ProtectedRoute>
-                <ForumDiskusi />
-              </ProtectedRoute>
-            } />
-            <Route path="/pengaduan" element={
-              <ProtectedRoute>
-                <Pengaduan />
-              </ProtectedRoute>
-            } />
-            <Route path="/konsultasi" element={
-              <ProtectedRoute>
-                <KonsultasiHukum />
-              </ProtectedRoute>
-            } />
-            <Route path="/konsultasi/ai" element={
-              <ProtectedRoute>
-                <AIConsultation />
-              </ProtectedRoute>
-            } />
-            <Route path="/konsultasi/chat" element={
-              <ProtectedRoute>
-                <LiveChat />
-              </ProtectedRoute>
-            } />
-            <Route path="/admin/*" element={
-              <AdminRoute>
-                <AdminApp />
-              </AdminRoute>
-            } />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </div>
-      </AuthProvider>
-    </BrowserRouter>
+    <React.StrictMode>
+      <TooltipProvider>
+        <BrowserRouter>
+          <AuthProvider>
+            <div className="App">
+              <Toaster />
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/announcements" element={<AnnouncementsList />} />
+                <Route path="/announcements/:id" element={<AnnouncementDetails />} />
+                
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/otp-verification" element={<OtpVerification />} />
+                <Route path="/registration-success" element={<RegistrationSuccess />} />
+                
+                <Route path="/dashboard" element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                } />
+                <Route path="/profile" element={
+                  <ProtectedRoute>
+                    <Profile />
+                  </ProtectedRoute>
+                } />
+                <Route path="/forum" element={
+                  <ProtectedRoute>
+                    <ForumDiskusi />
+                  </ProtectedRoute>
+                } />
+                <Route path="/pengaduan" element={
+                  <ProtectedRoute>
+                    <Pengaduan />
+                  </ProtectedRoute>
+                } />
+                <Route path="/konsultasi" element={
+                  <ProtectedRoute>
+                    <KonsultasiHukum />
+                  </ProtectedRoute>
+                } />
+                <Route path="/konsultasi/ai" element={
+                  <ProtectedRoute>
+                    <AIConsultation />
+                  </ProtectedRoute>
+                } />
+                <Route path="/konsultasi/chat" element={
+                  <ProtectedRoute>
+                    <LiveChat />
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin/*" element={
+                  <AdminRoute>
+                    <AdminApp />
+                  </AdminRoute>
+                } />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </div>
+          </AuthProvider>
+        </BrowserRouter>
+      </TooltipProvider>
+    </React.StrictMode>
   );
 }
 

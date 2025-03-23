@@ -157,11 +157,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     );
   }
 
+  // Avoid nested Suspense for better performance (remove it if it causes issues)
   return (
     <AuthContext.Provider value={value}>
-      <Suspense fallback={<p className="text-center p-4">Loading authentication...</p>}>
-        {children}
-      </Suspense>
+      {loading ? (
+        <p className="text-center p-4">Loading authentication...</p>
+      ) : (
+        children
+      )}
     </AuthContext.Provider>
   );
 };
