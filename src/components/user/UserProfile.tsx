@@ -11,16 +11,23 @@ import MembershipInfo from './MembershipInfo';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const UserProfile: React.FC = () => {
-  console.log("UserProfile rendering");
-  
-  // Set up router hooks inside the component body
+  // Move all hook calls to the top of the component function
   const navigate = useNavigate();
   const location = useLocation();
-  
   const { user, loading } = useAuth();
+  
   const [editing, setEditing] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  
+  console.log("UserProfile rendering with router context:", { 
+    hasNavigate: !!navigate,
+    currentPath: location.pathname,
+    userExists: !!user, 
+    loading, 
+    editing,
+    userEmail: user?.email || 'none'
+  });
   
   // Function to handle going back to dashboard
   const handleGoBack = () => {
@@ -51,13 +58,6 @@ const UserProfile: React.FC = () => {
       window.removeEventListener('offline', handleOnlineStatus);
     };
   }, []);
-
-  console.log("UserProfile rendering state:", { 
-    userExists: !!user, 
-    loading, 
-    editing,
-    userEmail: user?.email || 'none'
-  });
   
   // Separate the rendering logic based on state
   if (loading) {
