@@ -4,7 +4,7 @@ import { Button } from './ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 
 const MainNavigation = () => {
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
 
   return (
     <nav className="bg-white py-4 px-6 flex justify-between items-center shadow-sm">
@@ -15,7 +15,7 @@ const MainNavigation = () => {
           <Link to="/forum-diskusi" className="text-gray-600 hover:text-teal hover:underline hover:underline-offset-4">Forum</Link>
           <Link to="/pengaduan" className="text-gray-600 hover:text-teal hover:underline hover:underline-offset-4">Pengaduan</Link>
           <Link to="/konsultasi-hukum" className="text-gray-600 hover:text-teal hover:underline hover:underline-offset-4">Konsultasi</Link>
-          {user && <Link to="/admin" className="text-gray-600 hover:text-teal hover:underline hover:underline-offset-4">Admin</Link>}
+          {user && isAdmin && <Link to="/admin" className="text-gray-600 hover:text-teal hover:underline hover:underline-offset-4">Admin</Link>}
         </div>
       </div>
       <div className="flex items-center space-x-4">

@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Routes, Route, Link, Navigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
@@ -12,8 +13,9 @@ import {
   SidebarMenuButton,
   SidebarProvider,
 } from "@/components/ui/sidebar";
-import { LayoutDashboard, Users, MessageSquare, Flag, Gavel, LogOut } from "lucide-react";
+import { LayoutDashboard, Users, MessageSquare, Flag, Gavel, LogOut, ShieldCheck } from "lucide-react";
 import SignOutButton from "@/components/auth/SignOutButton";
+import AddAdmin from "./AddAdmin";
 
 const DashboardAdmin = () => {
   return (
@@ -79,6 +81,21 @@ const DashboardAdmin = () => {
             </div>
           </CardContent>
         </Card>
+        
+        <Card className="hover:shadow-md transition-shadow">
+          <CardContent className="p-6">
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="h-5 w-5 text-teal" />
+                <h2 className="text-lg font-semibold">Kelola Admin</h2>
+              </div>
+              <p className="text-sm text-gray-600">Atur hak akses admin sistem.</p>
+              <Link to="/admin/add-admin" className="mt-2">
+                <Button className="w-full bg-teal hover:bg-teal/90">Kelola</Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
@@ -135,6 +152,14 @@ const AdminSidebar = () => {
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild tooltip="Kelola Admin">
+              <Link to="/admin/add-admin">
+                <ShieldCheck />
+                <span>Kelola Admin</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
         </SidebarMenu>
       </SidebarContent>
       <SidebarFooter className="border-t p-4">
@@ -158,6 +183,7 @@ const AdminApp = () => {
               <Route path="/forum" element={<Forum />} />
               <Route path="/pengaduan" element={<Pengaduan />} />
               <Route path="/konsultasi" element={<Konsultasi />} />
+              <Route path="/add-admin" element={<AddAdmin />} />
               <Route path="*" element={<Navigate to="/admin" replace />} />
             </Routes>
           </main>
