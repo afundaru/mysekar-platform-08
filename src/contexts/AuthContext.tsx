@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo, useCallback, Suspense } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -157,7 +157,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     );
   }
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      <Suspense fallback={<p className="text-center p-4">Loading authentication...</p>}>
+        {children}
+      </Suspense>
+    </AuthContext.Provider>
+  );
 };
 
 export const useAuth = () => {
