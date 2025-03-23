@@ -23,13 +23,13 @@ const root = ReactDOM.createRoot(rootElement);
 // This ensures contexts are available throughout the application
 root.render(
   <React.StrictMode>
-    <Router>
-      <TooltipProvider>
-        <AuthProvider>
+    <AuthProvider>
+      <Router>
+        <TooltipProvider>
           <App />
-        </AuthProvider>
-      </TooltipProvider>
-    </Router>
+        </TooltipProvider>
+      </Router>
+    </AuthProvider>
   </React.StrictMode>
 );
 
