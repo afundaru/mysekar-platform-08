@@ -19,26 +19,11 @@ interface ProfileAvatarProps {
 }
 
 const ProfileAvatar: React.FC<ProfileAvatarProps> = ({ user, avatarUrl, setAvatarUrl }) => {
+  // Initialize all hooks at the top level - they must be called on every render
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
-  
-  // Guard for null user
-  if (!user) {
-    return (
-      <div className="relative mr-4">
-        <Avatar className="h-16 w-16">
-          <AvatarFallback>U</AvatarFallback>
-        </Avatar>
-      </div>
-    );
-  }
-  
-  const memberData = user?.user_metadata || {};
-  
-  // Fallback avatar URL
-  const fallbackAvatarUrl = "https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-1.jpg";
   
   // Function to handle file selection
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -97,6 +82,13 @@ const ProfileAvatar: React.FC<ProfileAvatarProps> = ({ user, avatarUrl, setAvata
     cameraInputRef.current?.click();
   };
   
+  // Fallback avatar URL
+  const fallbackAvatarUrl = "https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-1.jpg";
+  
+  // Safe access to user metadata
+  const memberData = user?.user_metadata || {};
+  const userInitial = memberData?.full_name?.charAt(0) || user?.email?.charAt(0) || 'U';
+  
   return (
     <div className="relative mr-4">
       <Avatar className="h-16 w-16">
@@ -112,10 +104,9 @@ const ProfileAvatar: React.FC<ProfileAvatarProps> = ({ user, avatarUrl, setAvata
         ) : (
           <AvatarImage src={fallbackAvatarUrl} alt="Profile" />
         )}
-        <AvatarFallback>{memberData?.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}</AvatarFallback>
+        <AvatarFallback>{userInitial}</AvatarFallback>
       </Avatar>
       
-      {/* Moved the DropdownMenu outside of any conditional rendering to ensure React hooks order is preserved */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button 
