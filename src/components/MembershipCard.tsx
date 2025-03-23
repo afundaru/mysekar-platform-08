@@ -12,6 +12,20 @@ const ErrorFallback = ({ error }) => (
 
 const MembershipCardContent = () => {
   const { user } = useAuth();
+  
+  // Fallback if user data is not available
+  if (!user) {
+    return (
+      <Card className="bg-gradient-to-r from-blue-600 to-teal-500 text-white shadow-xl w-full max-w-md mx-auto opacity-70">
+        <CardContent className="p-6">
+          <div className="text-center py-4">
+            <p>Loading membership data...</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+  
   const memberData = user?.user_metadata || {};
 
   return (

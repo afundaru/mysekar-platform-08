@@ -17,20 +17,21 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 
-const UserProfile: React.FC = () => {
-  const { user } = useAuth();
-  let navigate;
-  
+// Fallback navigation function that uses window.location
+const useSafeNavigate = () => {
   try {
-    navigate = useNavigate();
+    return useNavigate();
   } catch (error) {
-    // Fallback if navigate hook is not available
-    console.error("Navigation hook error:", error);
-    navigate = () => {
-      console.warn("Navigate function not available, using fallback");
-      window.location.href = '/dashboard';
+    console.warn("React Router's useNavigate hook is not available, using fallback");
+    return (path: string) => {
+      window.location.href = path;
     };
   }
+};
+
+const UserProfile: React.FC = () => {
+  const { user } = useAuth();
+  const navigate = useSafeNavigate();
   
   const [editing, setEditing] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
