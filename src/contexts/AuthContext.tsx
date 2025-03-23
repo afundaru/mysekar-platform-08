@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -21,7 +20,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | null>(null);
 
 // Export the AuthProvider component
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
@@ -29,12 +28,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isAdmin, setIsAdmin] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
-  // Function to check admin status
   const checkIsAdmin = useCallback(async (): Promise<boolean> => {
     if (!user) return false;
     
     try {
-      // Add timeout for the request
       const timeoutPromise = new Promise<{data: null, error: Error}>((_, reject) => {
         setTimeout(() => reject(new Error('Request timeout')), 10000);
       });
@@ -59,18 +56,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return isUserAdmin;
     } catch (error) {
       console.error('Error checking admin status:', error);
-      // Don't change existing state on error
-      return isAdmin; // Return current state
+      return isAdmin;
     }
   }, [user, isAdmin]);
 
   useEffect(() => {
-    // Set up auth state listener
     const setupAuth = async () => {
       try {
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
           async (event, currentSession) => {
-            // Enhanced logging for auth events
             console.log('Auth event:', event);
             
             setSession(currentSession);
@@ -81,7 +75,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 await checkIsAdmin();
               } catch (e) {
                 console.error('Failed to check admin status after auth change:', e);
-                // Set default role
                 setUserRole('user');
               }
             } else {
@@ -93,7 +86,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
         );
 
-        // Check for existing session
         const { data: { session: currentSession } } = await supabase.auth.getSession();
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
@@ -103,7 +95,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             await checkIsAdmin();
           } catch (e) {
             console.error('Failed to check admin status on initial load:', e);
-            // Set default role
             setUserRole('user');
           }
         }
@@ -126,7 +117,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signOut = async () => {
     try {
       await supabase.auth.signOut();
-      // Clear any cached data after sign out
       toast.success('Berhasil keluar dari sistem');
     } catch (error) {
       console.error('Error signing out:', error);
@@ -134,12 +124,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Memoized function to validate email domain
   const isValidEmail = useCallback((email: string): boolean => {
     return email.endsWith('@bankraya.co.id');
   }, []);
 
-  // Memoized context value
   const value = useMemo(() => ({
     session,
     user,
@@ -152,7 +140,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }), [session, user, loading, userRole, isAdmin, checkIsAdmin, isValidEmail]);
 
   if (error) {
-    // Render an error state rather than crashing the app
     return (
       <div className="p-4 text-center">
         <h3 className="text-xl font-bold text-red-500 mb-4">Authentication Error</h3>
@@ -170,7 +157,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-// Create the useAuth hook with null-check
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === null) {
