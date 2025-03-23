@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -13,7 +13,11 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
   // If still loading, show nothing or a loading indicator
   if (loading) {
-    return null; // or return a loading spinner
+    return (
+      <div className="flex justify-center items-center h-16 my-4">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-teal"></div>
+      </div>
+    );
   }
 
   // If not authenticated, redirect to login

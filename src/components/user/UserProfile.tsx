@@ -11,24 +11,10 @@ import MembershipInfo from './MembershipInfo';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const UserProfile: React.FC = () => {
-  // Early bail-out to check if we're in the proper context
-  // and render a minimal version if not
-  try {
-    // This will throw if RouterContext is not available
-    useLocation();
-  } catch (e) {
-    console.error("Router context not available", e);
-    return (
-      <div className="w-full max-w-md mx-auto p-4">
-        <div className="flex justify-center items-center h-48">
-          <p>Loading profile...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Now that we know RouterContext is available, we can use navigate
+  // Set up router hooks
   const navigate = useNavigate();
+  const location = useLocation();
+  
   const { user, loading } = useAuth();
   const [editing, setEditing] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
