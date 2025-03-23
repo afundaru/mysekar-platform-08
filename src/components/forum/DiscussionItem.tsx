@@ -7,7 +7,6 @@ interface DiscussionItemProps {
   title: string;
   category: string;
   author: string;
-  createdAt: string;
   likes: number;
   comments: number;
   isLiked: boolean;
