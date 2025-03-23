@@ -19,17 +19,17 @@ if (!rootElement) {
 // Create root outside of render to help with debugging
 const root = ReactDOM.createRoot(rootElement);
 
-// Mount the application with all providers at the root level
-// This ensures contexts are available throughout the application
+// Mount the application with providers in the correct order
+// Router should be outside AuthProvider since AuthProvider uses router hooks
 root.render(
   <React.StrictMode>
-    <AuthProvider>
-      <Router>
+    <Router>
+      <AuthProvider>
         <TooltipProvider>
           <App />
         </TooltipProvider>
-      </Router>
-    </AuthProvider>
+      </AuthProvider>
+    </Router>
   </React.StrictMode>
 );
 
