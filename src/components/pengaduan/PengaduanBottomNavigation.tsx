@@ -1,46 +1,49 @@
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Home, MessageSquare, FilePen, Bot, User } from 'lucide-react';
 
 const PengaduanBottomNavigation: React.FC = () => {
-  const navigate = useNavigate();
+  const location = useLocation();
 
   return (
     <nav className="fixed bottom-0 w-full bg-white border-t border-gray-200 px-4 py-2">
       <div className="flex justify-around items-center">
-        <button 
+        <Link 
+          to="/dashboard"
           className="flex flex-col items-center text-gray-400"
-          onClick={() => navigate('/dashboard')}
         >
           <Home className="h-5 w-5" />
           <span className="text-xs mt-1">Beranda</span>
-        </button>
-        <button className="flex flex-col items-center text-gray-400">
+        </Link>
+        <Link 
+          to="/forum"
+          className="flex flex-col items-center text-gray-400"
+        >
           <MessageSquare className="h-5 w-5" />
           <span className="text-xs mt-1">Forum</span>
-        </button>
-        <button 
+        </Link>
+        <Link 
+          to="/pengaduan"
           className="flex flex-col items-center text-teal"
-          onClick={() => navigate('/pengaduan')}
         >
           <FilePen className="h-5 w-5" />
           <span className="text-xs mt-1">Pengaduan</span>
-        </button>
-        <button 
+        </Link>
+        <Link 
+          to="/konsultasi"
           className="flex flex-col items-center text-gray-400"
-          onClick={() => navigate('/konsultasi-hukum')}
         >
           <Bot className="h-5 w-5" />
           <span className="text-xs mt-1">Konsultasi</span>
-        </button>
-        <button 
+        </Link>
+        <Link 
+          to="/profile"
           className="flex flex-col items-center text-gray-400"
-          onClick={() => navigate('/profile')}
         >
           <User className="h-5 w-5" />
           <span className="text-xs mt-1">Profil</span>
-        </button>
+        </Link>
       </div>
     </nav>
   );

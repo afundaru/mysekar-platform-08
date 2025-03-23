@@ -1,98 +1,145 @@
 
 import React, { useState, useEffect } from 'react';
-import { Plus } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
-import PengaduanBottomNavigation from '../components/pengaduan/PengaduanBottomNavigation';
-import PengaduanPageHeader from '../components/pengaduan/PengaduanPageHeader';
-import ComplaintSubmissionForm from '../components/pengaduan/ComplaintSubmissionForm';
-import ComplaintsList from '../components/pengaduan/ComplaintsList';
-import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-
-interface Complaint {
-  id: string;
-  title: string;
-  category: string;
-  status: string;
-  created_at: string;
-}
+import PengaduanHeader from '@/components/pengaduan/PengaduanHeader';
+import QuickActions from '@/components/pengaduan/QuickActions';
+import ComplaintsList from '@/components/pengaduan/ComplaintsList';
+import PengaduanBottomNavigation from '@/components/pengaduan/PengaduanBottomNavigation';
+import ComplaintSubmissionForm from '@/components/pengaduan/ComplaintSubmissionForm';
+import ComplaintHistory from '@/components/pengaduan/ComplaintHistory';
+import { Loader2 } from 'lucide-react';
 
 const Pengaduan: React.FC = () => {
-  const { user } = useAuth();
-  const [complaints, setComplaints] = useState<Complaint[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [loadError, setLoadError] = useState<string | null>(null);
+  const [complaints, setComplaints] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [currentView, setCurrentView] = useState<'list' | 'form' | 'history'>('list');
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchComplaints();
-  }, [user]);
+  }, []);
 
   const fetchComplaints = async () => {
-    if (!user) return;
-
+    setIsLoading(true);
+    setError(null);
+    
     try {
-      setIsLoading(true);
-      setLoadError(null);
+      // Get user ID from session
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
       
-      const { data, error } = await supabase
-        .from('complaints')
-        .select('id, title, category, status, created_at')
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('Error fetching complaints:', error);
-        setLoadError("Gagal memuat data pengaduan");
-      } else {
-        setComplaints(data || []);
+      if (sessionError) {
+        throw new Error('Sesi pengguna tidak ditemukan. Silakan masuk kembali.');
       }
-    } catch (error) {
-      console.error('Error in fetchComplaints:', error);
-      setLoadError("Gagal memuat data pengaduan");
+      
+      if (!sessionData.session?.user.id) {
+        navigate('/login');
+        return;
+      }
+      
+      const userId = sessionData.session.user.id;
+      
+      // Fetch complaints for the current user
+      const { data, error: complaintsError } = await supabase
+        .from('complaints')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+      
+      if (complaintsError) {
+        throw complaintsError;
+      }
+      
+      setComplaints(data || []);
+    } catch (err: any) {
+      console.error('Error fetching complaints:', err);
+      setError('Gagal memuat data pengaduan. Silakan coba lagi nanti.');
+      toast.error('Gagal memuat data pengaduan');
     } finally {
       setIsLoading(false);
     }
   };
 
+  const handleNewComplaint = () => {
+    setCurrentView('form');
+  };
+
+  const handleViewHistory = () => {
+    setCurrentView('history');
+  };
+
+  const handleBack = () => {
+    setCurrentView('list');
+  };
+
+  const handleComplaintSubmitted = () => {
+    setCurrentView('list');
+    fetchComplaints();
+    toast.success('Pengaduan berhasil dikirim');
+  };
+
   return (
-    <div className="min-h-screen bg-gray-100 pb-20">
-      <PengaduanPageHeader />
-      
-      {/* Form Pengaduan */}
-      <div className="p-4 bg-white shadow-md mt-2">
-        <h2 className="font-semibold text-lg mb-2">Buat Pengaduan Baru</h2>
-        
-        {loadError && (
-          <Alert variant="destructive" className="mb-4">
-            <AlertTitle>Error</AlertTitle>
-            <AlertDescription>{loadError}</AlertDescription>
-          </Alert>
-        )}
-        
-        <ComplaintSubmissionForm 
-          userId={user?.id}
-          onComplaintSubmitted={fetchComplaints}
-        />
-      </div>
+    <div className="min-h-screen bg-gray-50 pb-16">
+      <PengaduanHeader 
+        title={
+          currentView === 'list' 
+            ? 'Pengaduan dan Tindak Lanjut' 
+            : currentView === 'form' 
+              ? 'Buat Pengaduan Baru' 
+              : 'Riwayat Pengaduan'
+        }
+        showBackButton={currentView !== 'list'}
+        onBackClick={handleBack}
+      />
 
-      {/* Status Pengaduan */}
-      <div className="p-4">
-        <ComplaintsList 
-          complaints={complaints}
-          isLoading={isLoading}
-          loadError={loadError}
-          onRetry={fetchComplaints}
-        />
-      </div>
+      {currentView === 'list' && (
+        <>
+          <QuickActions 
+            onNewComplaint={handleNewComplaint} 
+            onHistory={handleViewHistory} 
+          />
+          
+          {isLoading ? (
+            <div className="flex justify-center items-center py-10">
+              <Loader2 className="h-8 w-8 animate-spin text-teal" />
+              <span className="ml-2 text-gray-600">Memuat data...</span>
+            </div>
+          ) : error ? (
+            <div className="bg-red-50 border border-red-200 rounded-lg mx-4 my-6 p-4 text-center">
+              <p className="text-red-600">{error}</p>
+              <button 
+                className="mt-2 px-4 py-2 bg-teal text-white rounded-lg"
+                onClick={fetchComplaints}
+              >
+                Coba Lagi
+              </button>
+            </div>
+          ) : complaints.length === 0 ? (
+            <div className="bg-white shadow rounded-lg mx-4 my-6 p-4 text-center">
+              <p className="text-gray-600">Belum ada pengaduan yang dibuat.</p>
+              <button 
+                className="mt-2 px-4 py-2 bg-teal text-white rounded-lg"
+                onClick={handleNewComplaint}
+              >
+                Buat Pengaduan Baru
+              </button>
+            </div>
+          ) : (
+            <ComplaintsList complaints={complaints} />
+          )}
+        </>
+      )}
 
-      {/* Floating Button */}
-      <Button 
-        className="fixed bottom-20 right-6 bg-teal hover:bg-teal/90 rounded-full h-14 w-14 p-0"
-        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-      >
-        <Plus size={24} />
-      </Button>
-      
+      {currentView === 'form' && (
+        <ComplaintSubmissionForm onSubmitSuccess={handleComplaintSubmitted} />
+      )}
+
+      {currentView === 'history' && (
+        <ComplaintHistory complaints={complaints} isLoading={isLoading} error={error} onRetry={fetchComplaints} />
+      )}
+
       <PengaduanBottomNavigation />
     </div>
   );
