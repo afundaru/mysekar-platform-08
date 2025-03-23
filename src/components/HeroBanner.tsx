@@ -17,7 +17,7 @@ const HeroBanner: React.FC = () => {
         src="https://images.unsplash.com/photo-1620785770286-e2d7311d2f02?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80" 
         alt="Professional men and women protesting with raised fists" 
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-teal/20"></div>
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-light-teal/20"></div>
       <div className="absolute bottom-0 left-0 p-6 md:p-8 lg:p-10 text-white max-w-2xl">
         <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-2 animate-slide-up">Salam Solidaritas!</h1>
         <p className="text-sm md:text-base lg:text-lg mb-4 md:mb-6 animate-slide-up animate-delay-100 max-w-lg">
