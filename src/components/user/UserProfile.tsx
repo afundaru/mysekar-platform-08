@@ -1,5 +1,5 @@
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -25,8 +25,9 @@ const UserProfile: React.FC = () => {
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
+  const [error, setError] = useState<string | null>(null);
   
-  const memberData = user?.user_metadata;
+  const memberData = user?.user_metadata || {};
 
   // Function to handle file selection
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -34,12 +35,18 @@ const UserProfile: React.FC = () => {
     if (!file || !user) return;
     
     setUploading(true);
+    setError(null);
     
     try {
       // Generate a unique file name
       const fileExt = file.name.split('.').pop();
       const fileName = `${user.id}-${Math.random().toString(36).substring(2)}.${fileExt}`;
       const filePath = `${fileName}`;
+      
+      // Check file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        throw new Error('File too large. Maximum size is 5MB.');
+      }
       
       // Upload the file to Supabase Storage
       const { error: uploadError, data } = await supabase.storage
@@ -60,9 +67,10 @@ const UserProfile: React.FC = () => {
       
       setAvatarUrl(publicUrlData.publicUrl);
       toast.success("Foto profil berhasil diperbarui");
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error uploading avatar:', error);
-      toast.error("Gagal mengunggah foto profil");
+      setError(error.message || "Gagal mengunggah foto profil");
+      toast.error(error.message || "Gagal mengunggah foto profil");
     } finally {
       setUploading(false);
     }
@@ -79,15 +87,35 @@ const UserProfile: React.FC = () => {
   };
   
   // Load avatar URL from user metadata on component mount
-  React.useEffect(() => {
+  useEffect(() => {
     if (user?.user_metadata?.avatar_url) {
       setAvatarUrl(user.user_metadata.avatar_url);
     }
   }, [user]);
   
+  // Handle offline state
+  useEffect(() => {
+    const handleOnlineStatus = () => {
+      if (!navigator.onLine) {
+        toast.warning("Anda sedang offline. Beberapa fitur mungkin tidak tersedia.");
+      }
+    };
+    
+    window.addEventListener('online', handleOnlineStatus);
+    window.addEventListener('offline', handleOnlineStatus);
+    
+    return () => {
+      window.removeEventListener('online', handleOnlineStatus);
+      window.removeEventListener('offline', handleOnlineStatus);
+    };
+  }, []);
+  
   if (editing) {
     return <ProfileEditForm onCancel={() => setEditing(false)} />;
   }
+  
+  // Fallback avatar URL
+  const fallbackAvatarUrl = "https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-1.jpg";
   
   return (
     <div className="w-full max-w-md mx-auto">
@@ -111,12 +139,29 @@ const UserProfile: React.FC = () => {
         </Button>
       </div>
       
+      {error && (
+        <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">
+          {error}
+        </div>
+      )}
+      
       <Card className="mb-6">
         <CardContent className="pt-6">
           <div className="flex items-center">
             <div className="relative mr-4">
               <Avatar className="h-16 w-16">
-                <AvatarImage src={avatarUrl || "https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-1.jpg"} alt="Profile" />
+                {avatarUrl ? (
+                  <AvatarImage 
+                    src={avatarUrl} 
+                    alt="Profile" 
+                    onError={(e) => {
+                      // Fallback if image fails to load
+                      e.currentTarget.src = fallbackAvatarUrl;
+                    }}
+                  />
+                ) : (
+                  <AvatarImage src={fallbackAvatarUrl} alt="Profile" />
+                )}
                 <AvatarFallback>{memberData?.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}</AvatarFallback>
               </Avatar>
               
@@ -128,7 +173,11 @@ const UserProfile: React.FC = () => {
                     className="absolute -bottom-2 -right-2 h-7 w-7 rounded-full bg-teal hover:bg-teal-600"
                     disabled={uploading}
                   >
-                    <Camera className="h-3.5 w-3.5 text-white" />
+                    {uploading ? (
+                      <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                    ) : (
+                      <Camera className="h-3.5 w-3.5 text-white" />
+                    )}
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="center">

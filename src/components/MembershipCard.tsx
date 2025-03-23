@@ -5,7 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 
 const MembershipCard: React.FC = () => {
   const { user } = useAuth();
-  const memberData = user?.user_metadata;
+  const memberData = user?.user_metadata || {};
 
   return (
     <Card className="bg-gradient-to-r from-blue-600 to-teal-500 text-white shadow-xl w-full max-w-md mx-auto">
@@ -25,7 +25,7 @@ const MembershipCard: React.FC = () => {
         <div className="mt-6 mb-4">
           <h4 className="text-lg font-bold">{memberData?.full_name || 'Nama Anggota'}</h4>
           <p className="text-sm opacity-90">PN: {memberData?.pn_number || '000000'}</p>
-          <p className="text-sm opacity-90">{memberData?.email || 'email@bankraya.co.id'}</p>
+          <p className="text-sm opacity-90">{user?.email || 'email@bankraya.co.id'}</p>
         </div>
         
         <div className="flex justify-between items-end mt-6">
