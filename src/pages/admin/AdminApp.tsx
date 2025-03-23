@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Routes, Route, Link, Navigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
@@ -169,30 +168,6 @@ const AdminSidebar = () => {
   );
 };
 
-const AdminApp = () => {
-  return (
-    <SidebarProvider>
-      <div className="flex min-h-screen w-full">
-        <AdminSidebar />
-        <div className="flex-1">
-          <div className="bg-teal h-2" />
-          <main className="p-4">
-            <Routes>
-              <Route path="/" element={<DashboardAdmin />} />
-              <Route path="/keanggotaan" element={<Keanggotaan />} />
-              <Route path="/forum" element={<Forum />} />
-              <Route path="/pengaduan" element={<Pengaduan />} />
-              <Route path="/konsultasi" element={<Konsultasi />} />
-              <Route path="/add-admin" element={<AddAdmin />} />
-              <Route path="*" element={<Navigate to="/admin" replace />} />
-            </Routes>
-          </main>
-        </div>
-      </div>
-    </SidebarProvider>
-  );
-};
-
 const Keanggotaan = () => {
   return (
     <div className="space-y-4">
@@ -242,6 +217,30 @@ const Konsultasi = () => {
         </CardContent>
       </Card>
     </div>
+  );
+};
+
+const AdminApp = () => {
+  return (
+    <SidebarProvider>
+      <div className="flex min-h-screen w-full">
+        <AdminSidebar />
+        <div className="flex-1">
+          <div className="bg-teal h-2" />
+          <main className="p-4">
+            <Routes>
+              <Route index element={<DashboardAdmin />} />
+              <Route path="keanggotaan" element={<Keanggotaan />} />
+              <Route path="forum" element={<Forum />} />
+              <Route path="pengaduan" element={<Pengaduan />} />
+              <Route path="konsultasi" element={<Konsultasi />} />
+              <Route path="add-admin" element={<AddAdmin />} />
+              <Route path="*" element={<Navigate to="/admin" replace />} />
+            </Routes>
+          </main>
+        </div>
+      </div>
+    </SidebarProvider>
   );
 };
 
