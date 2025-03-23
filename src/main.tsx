@@ -6,7 +6,7 @@ import './index.css'
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import { toast } from 'sonner';
 import { BrowserRouter as Router } from 'react-router-dom';
-import { TooltipProvider } from "@/components/ui/tooltip";
+import * as TooltipPrimitive from "@radix-ui/react-tooltip"
 import { AuthProvider } from '@/contexts/AuthContext';
 
 // Make sure we're using the correct element for mounting
@@ -19,18 +19,16 @@ if (!rootElement) {
 // Create root outside of render to help with debugging
 const root = ReactDOM.createRoot(rootElement);
 
-// React.StrictMode harus menjadi wrapper terluar
-// Kemudian Router harus berada di luar AuthProvider karena AuthProvider 
-// mungkin menggunakan hook yang disediakan oleh Router
+// Proper provider nesting to ensure React context works correctly
 root.render(
   <React.StrictMode>
-    <Router>
-      <TooltipProvider>
+    <TooltipPrimitive.Provider>
+      <Router>
         <AuthProvider>
           <App />
         </AuthProvider>
-      </TooltipProvider>
-    </Router>
+      </Router>
+    </TooltipPrimitive.Provider>
   </React.StrictMode>
 );
 
