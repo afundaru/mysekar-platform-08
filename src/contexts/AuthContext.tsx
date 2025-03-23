@@ -33,6 +33,7 @@ const AuthContext = createContext<AuthContextType>({
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   console.log("AuthProvider rendering");
   
+  // Pastikan useState digunakan dalam lingkup komponen React
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);

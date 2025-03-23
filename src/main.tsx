@@ -19,8 +19,9 @@ if (!rootElement) {
 // Create root outside of render to help with debugging
 const root = ReactDOM.createRoot(rootElement);
 
-// Ensure React is properly initialized by using a simple structure
-// React.StrictMode should be the outermost wrapper
+// React.StrictMode harus menjadi wrapper terluar
+// Kemudian Router harus berada di luar AuthProvider karena AuthProvider 
+// mungkin menggunakan hook yang disediakan oleh Router
 root.render(
   <React.StrictMode>
     <Router>
