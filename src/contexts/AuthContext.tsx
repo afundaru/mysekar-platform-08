@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -26,8 +26,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [userRole, setUserRole] = useState<AppRole | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
 
-  // Fungsi untuk memeriksa apakah pengguna adalah admin
-  const checkIsAdmin = async (): Promise<boolean> => {
+  // Improved memoized function to check admin status
+  const checkIsAdmin = useCallback(async (): Promise<boolean> => {
     if (!user) return false;
     
     try {
@@ -38,6 +38,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .eq('role', 'admin')
         .maybeSingle();
       
+      if (error) {
+        console.error('Error checking admin status:', error);
+        return false;
+      }
+      
       const isUserAdmin = !!data;
       setIsAdmin(isUserAdmin);
       setUserRole(isUserAdmin ? 'admin' : 'user');
@@ -46,12 +51,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.error('Error checking admin status:', error);
       return false;
     }
-  };
+  }, [user]);
 
   useEffect(() => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, currentSession) => {
+        // Enhanced logging for auth events
+        console.log('Auth event:', event);
+        
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
         
@@ -79,18 +87,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [checkIsAdmin]);
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    try {
+      await supabase.auth.signOut();
+      // Clear any cached data after sign out
+      toast.success('Berhasil keluar dari sistem');
+    } catch (error) {
+      console.error('Error signing out:', error);
+      toast.error('Gagal keluar dari sistem');
+    }
   };
 
-  // Function to validate email domain
-  const isValidEmail = (email: string): boolean => {
+  // Memoized function to validate email domain
+  const isValidEmail = useCallback((email: string): boolean => {
     return email.endsWith('@bankraya.co.id');
-  };
+  }, []);
 
-  const value = {
+  // Memoized context value
+  const value = useMemo(() => ({
     session,
     user,
     loading,
@@ -99,7 +115,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     signOut,
     isValidEmail,
     checkIsAdmin
-  };
+  }), [session, user, loading, userRole, isAdmin, checkIsAdmin, isValidEmail]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

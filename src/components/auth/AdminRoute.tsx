@@ -1,5 +1,4 @@
-
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback, memo } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
@@ -15,47 +14,66 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
   const [checking, setChecking] = useState(true);
   const [hasAccess, setHasAccess] = useState(false);
 
-  useEffect(() => {
-    const verifyAdminStatus = async () => {
-      if (!user) {
-        setChecking(false);
-        return;
-      }
+  const verifyAdminStatus = useCallback(async () => {
+    if (!user) {
+      setChecking(false);
+      return;
+    }
 
-      try {
-        // Log for debugging
-        console.log("Checking admin status for user:", user.id, "at path:", location.pathname);
+    try {
+      console.log("Checking admin status for user:", user.id, "at path:", location.pathname);
+      
+      const cacheKey = `admin_status_${user.id}`;
+      const cachedStatus = sessionStorage.getItem(cacheKey);
+      
+      if (cachedStatus) {
+        const { status, timestamp } = JSON.parse(cachedStatus);
+        const isRecent = Date.now() - timestamp < 5 * 60 * 1000;
         
-        // Langsung periksa ke database untuk status admin terbaru
-        const { data, error } = await supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', user.id)
-          .eq('role', 'admin')
-          .maybeSingle();
-        
-        if (error) {
-          console.error('Error checking admin status:', error);
-          toast.error('Gagal memeriksa status admin: ' + error.message);
-          setHasAccess(false);
-        } else {
-          setHasAccess(!!data); // true jika data ditemukan, false jika tidak
-          console.log('Admin status check result:', !!data, data);
+        if (isRecent) {
+          console.log('Using cached admin status:', status);
+          setHasAccess(status);
+          setChecking(false);
+          return;
         }
-      } catch (err) {
-        console.error('Exception checking admin status:', err);
-        setHasAccess(false);
-      } finally {
-        setChecking(false);
       }
-    };
+      
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'admin')
+        .maybeSingle();
+      
+      if (error) {
+        console.error('Error checking admin status:', error);
+        toast.error('Gagal memeriksa status admin: ' + error.message);
+        setHasAccess(false);
+      } else {
+        const isAdmin = !!data;
+        setHasAccess(isAdmin);
+        
+        sessionStorage.setItem(cacheKey, JSON.stringify({
+          status: isAdmin,
+          timestamp: Date.now()
+        }));
+        
+        console.log('Admin status check result:', isAdmin, data);
+      }
+    } catch (err) {
+      console.error('Exception checking admin status:', err);
+      setHasAccess(false);
+    } finally {
+      setChecking(false);
+    }
+  }, [user, location.pathname]);
 
+  useEffect(() => {
     if (!loading) {
       verifyAdminStatus();
     }
-  }, [user, loading, location.pathname]); // Added location.pathname to dependencies
+  }, [loading, verifyAdminStatus]);
 
-  // Jika masih loading atau sedang memeriksa status admin, tampilkan loading
   if (loading || checking) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -64,20 +82,17 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
     );
   }
 
-  // Jika belum login, redirect ke halaman login
   if (!user) {
     toast.error("Anda harus login terlebih dahulu");
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // Jika bukan admin, redirect ke dashboard dengan pesan error
   if (!hasAccess) {
     toast.error("Anda tidak memiliki akses ke halaman admin");
     return <Navigate to="/dashboard" state={{ from: location }} replace />;
   }
 
-  // Jika admin, izinkan akses
   return <>{children}</>;
 };
 
-export default AdminRoute;
+export default memo(AdminRoute);
