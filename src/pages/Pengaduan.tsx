@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Bell, Plus, Upload } from 'lucide-react';
+import { Bell, Plus, Upload, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -12,7 +12,9 @@ import PengaduanBottomNavigation from '../components/pengaduan/PengaduanBottomNa
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 
 const categories = ["Upah", "PHK", "Pelecehan", "Kondisi Kerja", "Lainnya"];
 
@@ -26,7 +28,7 @@ interface Complaint {
 
 const Pengaduan: React.FC = () => {
   const { user } = useAuth();
-  const { toast } = useToast();
+  const { toast: toastHook } = useToast();
   const [selectedCategory, setSelectedCategory] = useState<string>(categories[0]);
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
@@ -35,6 +37,7 @@ const Pengaduan: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [complaints, setComplaints] = useState<Complaint[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchComplaints();
@@ -45,6 +48,8 @@ const Pengaduan: React.FC = () => {
 
     try {
       setIsLoading(true);
+      setLoadError(null);
+      
       const { data, error } = await supabase
         .from('complaints')
         .select('id, title, category, status, created_at')
@@ -52,16 +57,13 @@ const Pengaduan: React.FC = () => {
 
       if (error) {
         console.error('Error fetching complaints:', error);
-        toast({
-          title: "Error",
-          description: "Gagal memuat data pengaduan",
-          variant: "destructive"
-        });
+        setLoadError("Gagal memuat data pengaduan");
       } else {
         setComplaints(data || []);
       }
     } catch (error) {
       console.error('Error in fetchComplaints:', error);
+      setLoadError("Gagal memuat data pengaduan");
     } finally {
       setIsLoading(false);
     }
@@ -75,20 +77,12 @@ const Pengaduan: React.FC = () => {
 
   const handleSubmit = async () => {
     if (!user) {
-      toast({
-        title: "Error",
-        description: "Anda harus login terlebih dahulu",
-        variant: "destructive"
-      });
+      toast.error("Anda harus login terlebih dahulu");
       return;
     }
 
     if (!title || !description) {
-      toast({
-        title: "Error",
-        description: "Judul dan deskripsi pengaduan wajib diisi",
-        variant: "destructive"
-      });
+      toast.error("Judul dan deskripsi pengaduan wajib diisi");
       return;
     }
 
@@ -142,10 +136,7 @@ const Pengaduan: React.FC = () => {
         }
       }
 
-      toast({
-        title: "Sukses",
-        description: "Pengaduan berhasil dikirim",
-      });
+      toast.success("Pengaduan berhasil dikirim");
       
       // Reset form
       setTitle("");
@@ -158,11 +149,7 @@ const Pengaduan: React.FC = () => {
       
     } catch (error) {
       console.error('Error submitting complaint:', error);
-      toast({
-        title: "Error",
-        description: "Gagal mengirim pengaduan",
-        variant: "destructive"
-      });
+      toast.error("Gagal mengirim pengaduan");
     } finally {
       setIsSubmitting(false);
     }
@@ -191,6 +178,14 @@ const Pengaduan: React.FC = () => {
       {/* Form Pengaduan */}
       <div className="p-4 bg-white shadow-md mt-2">
         <h2 className="font-semibold text-lg mb-2">Buat Pengaduan Baru</h2>
+        
+        {loadError && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>{loadError}</AlertDescription>
+          </Alert>
+        )}
+        
         <div className="space-y-3">
           <Select onValueChange={setSelectedCategory} defaultValue={selectedCategory}>
             <SelectTrigger>
@@ -251,7 +246,27 @@ const Pengaduan: React.FC = () => {
 
       {/* Status Pengaduan */}
       <div className="p-4">
-        <h2 className="font-semibold text-lg mb-2">Riwayat Pengaduan</h2>
+        <div className="flex justify-between items-center mb-2">
+          <h2 className="font-semibold text-lg">Riwayat Pengaduan</h2>
+          {loadError && (
+            <Button 
+              size="sm" 
+              variant="outline" 
+              onClick={fetchComplaints} 
+              className="flex items-center gap-1"
+            >
+              <RefreshCw className="h-4 w-4" />
+              Coba Lagi
+            </Button>
+          )}
+        </div>
+        
+        {loadError && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>{loadError}</AlertDescription>
+          </Alert>
+        )}
         
         {isLoading ? (
           <div className="flex justify-center p-8">
@@ -272,7 +287,7 @@ const Pengaduan: React.FC = () => {
           ))
         ) : (
           <Card className="p-4 text-center text-gray-500">
-            Belum ada pengaduan yang diajukan
+            {loadError ? "Gagal memuat data pengaduan" : "Belum ada pengaduan yang diajukan"}
           </Card>
         )}
       </div>
