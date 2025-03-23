@@ -5,12 +5,15 @@ import { Button } from "@/components/ui/button";
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
+import { AlertCircle, CheckCircle2 } from "lucide-react";
 
 const AddAdmin: React.FC = () => {
-  const { user } = useAuth();
+  const { user, checkIsAdmin } = useAuth();
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(false);
   const [checkingStatus, setCheckingStatus] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   // Check admin status on load
   useEffect(() => {
@@ -18,28 +21,21 @@ const AddAdmin: React.FC = () => {
       if (!user) return;
       
       try {
-        const { data, error } = await supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', user.id)
-          .eq('role', 'admin')
-          .maybeSingle();
-          
-        if (error) {
-          console.error('Error checking admin status:', error);
-          toast.error('Gagal memeriksa status admin');
-        } else {
-          setIsAdmin(!!data);
-        }
+        console.log("Memeriksa status admin untuk user:", user.id);
+        setError(null);
+        const isUserAdmin = await checkIsAdmin();
+        setIsAdmin(isUserAdmin);
+        console.log("Status admin:", isUserAdmin);
       } catch (err) {
-        console.error('Exception checking admin status:', err);
+        console.error('Error checking admin status:', err);
+        setError('Gagal memeriksa status admin');
       } finally {
         setCheckingStatus(false);
       }
     };
     
     checkAdminStatus();
-  }, [user]);
+  }, [user, checkIsAdmin]);
 
   const makeAdmin = async () => {
     if (!user) {
@@ -48,19 +44,27 @@ const AddAdmin: React.FC = () => {
     }
     
     setLoading(true);
+    setError(null);
+    setSuccess(null);
+    
     try {
+      console.log("Menambahkan user sebagai admin:", user.id);
+      
       // Cek apakah sudah ada admin di sistem
       const { data: existingAdmins, error: checkError } = await supabase
         .from('user_roles')
         .select('id')
-        .eq('role', 'admin')
-        .limit(1);
+        .eq('role', 'admin');
       
       if (checkError) {
+        console.error("Error checking existing admins:", checkError);
+        setError(`Gagal memeriksa admin yang ada: ${checkError.message}`);
         toast.error(`Gagal memeriksa admin yang ada: ${checkError.message}`);
         setLoading(false);
         return;
       }
+      
+      console.log("Existing admins check:", existingAdmins);
       
       // Jika belum ada admin atau pengguna sudah admin, buat pengguna saat ini sebagai admin
       const { error: insertError } = await supabase
@@ -68,24 +72,29 @@ const AddAdmin: React.FC = () => {
         .insert({ 
           user_id: user.id,
           role: 'admin'
-        })
-        .select()
-        .single();
+        });
       
       if (insertError) {
+        console.error("Error adding admin:", insertError);
         // Jika error karena unique constraint, berarti user sudah admin
         if (insertError.code === '23505') { // Unique violation code
+          setSuccess('Anda sudah menjadi admin');
           toast.info('Anda sudah menjadi admin');
           setIsAdmin(true);
         } else {
+          setError(`Gagal menambahkan admin: ${insertError.message}`);
           toast.error(`Gagal menambahkan admin: ${insertError.message}`);
         }
       } else {
+        setSuccess('Anda berhasil menjadi admin!');
         toast.success('Anda berhasil menjadi admin!');
         setIsAdmin(true);
+        // Update auth context
+        await checkIsAdmin();
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error making admin:', err);
+      setError(`Terjadi kesalahan: ${err.message || 'Unknown error'}`);
       toast.error('Terjadi kesalahan saat menambahkan admin');
     } finally {
       setLoading(false);
@@ -112,6 +121,20 @@ const AddAdmin: React.FC = () => {
           <CardTitle>Status Admin</CardTitle>
         </CardHeader>
         <CardContent>
+          {error && (
+            <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md flex items-start">
+              <AlertCircle className="h-5 w-5 mr-2 mt-0.5 flex-shrink-0" />
+              <p>{error}</p>
+            </div>
+          )}
+          
+          {success && (
+            <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-md flex items-start">
+              <CheckCircle2 className="h-5 w-5 mr-2 mt-0.5 flex-shrink-0" />
+              <p>{success}</p>
+            </div>
+          )}
+          
           <p className="mb-4">
             {isAdmin 
               ? 'Anda memiliki akses admin. Anda dapat mengelola aplikasi dan pengguna lain.'
