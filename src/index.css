@@ -106,7 +106,7 @@
   }
   
   .hero-gradient {
-    @apply bg-gradient-to-t from-black/80 via-black/50 to-teal/30;
+    @apply bg-gradient-to-t from-black/80 via-black/60 to-teal/30;
   }
   
   .animate-delay-100 {
