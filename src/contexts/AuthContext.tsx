@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -56,13 +57,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       return isUserAdmin;
     } catch (error) {
       console.error('Error checking admin status:', error);
-      return isAdmin;
+      return isAdmin; // Return current state if there's an error
     }
   }, [user, isAdmin]);
 
   useEffect(() => {
     const setupAuth = async () => {
       try {
+        // First set up the auth state change listener
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
           async (event, currentSession) => {
             console.log('Auth event:', event);
@@ -86,6 +88,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           }
         );
 
+        // Then check for any existing session
         const { data: { session: currentSession } } = await supabase.auth.getSession();
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
