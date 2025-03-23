@@ -9,6 +9,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import Admin from "./pages/admin";
 import KonsultasiHukum from "./pages/KonsultasiHukum"; // Direct import instead of lazy loading
+import Pengaduan from "./pages/Pengaduan"; // Direct import instead of lazy loading
 
 // Loading fallback component
 const LoadingFallback = () => (
@@ -37,9 +38,9 @@ const OtpVerification = lazy(() => import("./pages/OtpVerification"));
 const RegistrationSuccess = lazy(() => import("./pages/RegistrationSuccess"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 // KonsultasiHukum is now directly imported above
+// Pengaduan is now directly imported above
 const AIConsultation = lazy(() => import("./pages/AIConsultation"));
 const LiveChat = lazy(() => import("./pages/LiveChat"));
-const Pengaduan = lazy(() => import("./pages/Pengaduan"));
 const Profile = lazy(() => import("./pages/Profile"));
 const ForumDiskusi = lazy(() => import("./pages/ForumDiskusi"));
 const NotFound = lazy(() => import("./pages/NotFound"));
