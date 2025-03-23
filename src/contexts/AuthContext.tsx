@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -17,8 +16,17 @@ interface AuthContextType {
   checkIsAdmin: () => Promise<boolean>;
 }
 
-// Create the context with a default value
-const AuthContext = createContext<AuthContextType | null>(null);
+// Create the context with default values to avoid null context errors
+const AuthContext = createContext<AuthContextType>({
+  session: null,
+  user: null,
+  loading: true,
+  userRole: null,
+  isAdmin: false,
+  signOut: async () => {},
+  isValidEmail: () => false,
+  checkIsAdmin: async () => false
+});
 
 // Export the AuthProvider component
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -187,7 +195,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     checkIsAdmin
   }), [session, user, loading, userRole, isAdmin, checkIsAdmin, isValidEmail]);
 
-  console.log("AuthContext rendering state:", { 
+  console.log("AuthContext value:", { 
     hasUser: !!user, 
     userEmail: user?.email || 'none', 
     loading, 
@@ -218,7 +226,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (context === null) {
+  if (!context) {
+    console.error("useAuth must be used within an AuthProvider");
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;

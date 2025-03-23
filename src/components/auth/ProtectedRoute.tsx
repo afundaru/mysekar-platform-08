@@ -11,6 +11,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { user, loading } = useAuth();
   const location = useLocation();
 
+  console.log("ProtectedRoute state:", { user, loading, path: location.pathname });
+
   // If still loading, show nothing or a loading indicator
   if (loading) {
     return (
