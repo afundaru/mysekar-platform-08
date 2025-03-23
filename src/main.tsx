@@ -19,15 +19,15 @@ if (!rootElement) {
 // Create root outside of render to help with debugging
 const root = ReactDOM.createRoot(rootElement);
 
-// React StrictMode should wrap everything
+// Adjust the order of providers - React must be properly initialized first
 root.render(
   <React.StrictMode>
     <Router>
-      <AuthProvider>
-        <TooltipProvider>
+      <TooltipProvider>
+        <AuthProvider>
           <App />
-        </TooltipProvider>
-      </AuthProvider>
+        </AuthProvider>
+      </TooltipProvider>
     </Router>
   </React.StrictMode>
 );
