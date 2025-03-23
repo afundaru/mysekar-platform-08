@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import Header from '@/components/Header';
 import HeroBanner from '@/components/HeroBanner';
 import AnnouncementSection from '@/components/AnnouncementSection';
@@ -8,8 +8,8 @@ import Statistics from '@/components/Statistics';
 import BottomNavigation from '@/components/BottomNavigation';
 
 const Index: React.FC = () => {
-  // Use React.useEffect to ensure proper hook access
-  React.useEffect(() => {
+  // Use imported useEffect hook directly
+  useEffect(() => {
     // Add subtle animation on initial load
     document.body.classList.add('overflow-x-hidden');
     
