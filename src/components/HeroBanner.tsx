@@ -14,8 +14,8 @@ const HeroBanner: React.FC = () => {
     <section className="relative h-[280px] overflow-hidden animate-fade-in">
       <img 
         className="w-full h-full object-cover transform scale-100 hover:scale-105 transition-transform duration-700 ease-in-out" 
-        src="https://storage.googleapis.com/uxpilot-auth.appspot.com/e9f4ab2317-f40300d887c84ad76d24.png" 
-        alt="Modern illustration of labor union workers" 
+        src="https://images.unsplash.com/photo-1605810230434-7631ac76ec81?auto=format&fit=crop&w=1200&q=80" 
+        alt="Energetic group of labor union workers" 
       />
       <div className="absolute inset-0 hero-gradient"></div>
       <div className="absolute bottom-0 left-0 p-6 text-white">

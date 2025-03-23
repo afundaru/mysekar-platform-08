@@ -106,7 +106,7 @@
   }
   
   .hero-gradient {
-    @apply bg-gradient-to-t from-black/60 to-transparent;
+    @apply bg-gradient-to-t from-black/70 via-black/40 to-transparent;
   }
   
   .animate-delay-100 {
