@@ -35,7 +35,7 @@ const Index: React.FC = () => {
         <Statistics />
       </main>
       
-      {/* Bottom Navigation - Fixed component that doesn't rely on React Router context directly */}
+      {/* Bottom Navigation - Now using regular anchor tags instead of React Router Links */}
       <div className="fixed bottom-0 left-0 w-full">
         <BottomNavigation />
       </div>
