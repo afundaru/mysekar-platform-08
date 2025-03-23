@@ -7,7 +7,6 @@ import { User, ArrowLeft, Mail, Phone, UserRound, BadgeCheck, Edit, Camera, Imag
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import ProfileEditForm from './ProfileEditForm';
-import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import {
@@ -17,53 +16,8 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 
-// Enhanced safe navigation hook that doesn't rely on React Router context
-// if it's not available
-const useSafeNavigate = () => {
-  // State to track if we're using the fallback
-  const [usingFallback, setUsingFallback] = useState(false);
-
-  // Initialize navigation function
-  let navigate = (path: string) => {
-    console.log("Using window.location fallback navigation to:", path);
-    window.location.href = path;
-  };
-
-  // Try to use React Router's navigate if available
-  try {
-    // This will throw if not in Router context
-    const routerNavigate = useNavigate();
-    
-    if (typeof routerNavigate === 'function') {
-      navigate = (path: string) => {
-        console.log("Using react-router navigation to:", path);
-        routerNavigate(path);
-      };
-    } else {
-      setUsingFallback(true);
-      console.warn("useNavigate did not return a function, using fallback");
-    }
-  } catch (error) {
-    setUsingFallback(true);
-    console.warn("React Router's useNavigate hook is not available, using fallback");
-  }
-
-  // Log navigation status on mount
-  useEffect(() => {
-    if (usingFallback) {
-      console.log("Navigation is using window.location.href fallback");
-    } else {
-      console.log("Navigation is using React Router");
-    }
-  }, [usingFallback]);
-
-  return navigate;
-};
-
 const UserProfile: React.FC = () => {
   const { user } = useAuth();
-  const navigate = useSafeNavigate();
-  
   const [editing, setEditing] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -77,7 +31,7 @@ const UserProfile: React.FC = () => {
   const handleGoBack = () => {
     console.log("Navigating back to dashboard");
     try {
-      navigate('/dashboard');
+      window.location.href = '/dashboard';
     } catch (error) {
       console.error("Navigation error:", error);
       window.location.href = '/dashboard';
