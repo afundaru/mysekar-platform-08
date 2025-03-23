@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
-import { AlertCircle, CheckCircle2 } from "lucide-react";
+import { AlertCircle, CheckCircle2, WifiOff } from "lucide-react";
 
 const AddAdmin: React.FC = () => {
   const { user, checkIsAdmin } = useAuth();
@@ -14,6 +14,27 @@ const AddAdmin: React.FC = () => {
   const [checkingStatus, setCheckingStatus] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [isOffline, setIsOffline] = useState(!navigator.onLine);
+
+  // Listen for online/offline events
+  useEffect(() => {
+    const handleOnlineStatus = () => {
+      setIsOffline(!navigator.onLine);
+      if (navigator.onLine && error?.includes('Failed to fetch')) {
+        // Retry checking admin status when back online
+        checkAdminStatus();
+        toast.success('Koneksi telah dipulihkan');
+      }
+    };
+
+    window.addEventListener('online', handleOnlineStatus);
+    window.addEventListener('offline', handleOnlineStatus);
+    
+    return () => {
+      window.removeEventListener('online', handleOnlineStatus);
+      window.removeEventListener('offline', handleOnlineStatus);
+    };
+  }, [error]);
 
   // Check admin status on load
   useEffect(() => {
@@ -26,9 +47,15 @@ const AddAdmin: React.FC = () => {
         const isUserAdmin = await checkIsAdmin();
         setIsAdmin(isUserAdmin);
         console.log("Status admin:", isUserAdmin);
-      } catch (err) {
+      } catch (err: any) {
         console.error('Error checking admin status:', err);
-        setError('Gagal memeriksa status admin');
+        setError(`Gagal memeriksa status admin: ${err.message || 'Unknown error'}`);
+        
+        // Set default status in development mode
+        if (import.meta.env.DEV) {
+          setIsAdmin(true);
+          console.log('Development mode - assuming admin access for development purposes');
+        }
       } finally {
         setCheckingStatus(false);
       }
@@ -43,6 +70,11 @@ const AddAdmin: React.FC = () => {
       return;
     }
     
+    if (isOffline) {
+      toast.error('Tidak dapat menambahkan admin saat offline');
+      return;
+    }
+    
     setLoading(true);
     setError(null);
     setSuccess(null);
@@ -50,23 +82,7 @@ const AddAdmin: React.FC = () => {
     try {
       console.log("Menambahkan user sebagai admin:", user.id);
       
-      // Cek apakah sudah ada admin di sistem
-      const { data: existingAdmins, error: checkError } = await supabase
-        .from('user_roles')
-        .select('id')
-        .eq('role', 'admin');
-      
-      if (checkError) {
-        console.error("Error checking existing admins:", checkError);
-        setError(`Gagal memeriksa admin yang ada: ${checkError.message}`);
-        toast.error(`Gagal memeriksa admin yang ada: ${checkError.message}`);
-        setLoading(false);
-        return;
-      }
-      
-      console.log("Existing admins check:", existingAdmins);
-      
-      // Jika belum ada admin atau pengguna sudah admin, buat pengguna saat ini sebagai admin
+      // Coba langsung menambahkan user sebagai admin
       const { error: insertError } = await supabase
         .from('user_roles')
         .insert({ 
@@ -75,12 +91,14 @@ const AddAdmin: React.FC = () => {
         });
       
       if (insertError) {
-        console.error("Error adding admin:", insertError);
-        // Jika error karena unique constraint, berarti user sudah admin
+        // Handle error khusus constraint violation (sudah admin)
         if (insertError.code === '23505') { // Unique violation code
           setSuccess('Anda sudah menjadi admin');
           toast.info('Anda sudah menjadi admin');
           setIsAdmin(true);
+        } else if (insertError.message && insertError.message.includes('fetch')) {
+          // Network error
+          throw new Error('Gagal terhubung ke server. Periksa koneksi internet Anda.');
         } else {
           setError(`Gagal menambahkan admin: ${insertError.message}`);
           toast.error(`Gagal menambahkan admin: ${insertError.message}`);
@@ -96,8 +114,37 @@ const AddAdmin: React.FC = () => {
       console.error('Error making admin:', err);
       setError(`Terjadi kesalahan: ${err.message || 'Unknown error'}`);
       toast.error('Terjadi kesalahan saat menambahkan admin');
+      
+      // Set fallback admin status in development
+      if (import.meta.env.DEV) {
+        setSuccess('Mode development: status admin diberikan (simulasi)');
+        setIsAdmin(true);
+      }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const checkAdminStatus = async () => {
+    if (!user) return;
+    
+    setError(null);
+    try {
+      const isUserAdmin = await checkIsAdmin();
+      setIsAdmin(isUserAdmin);
+    } catch (err: any) {
+      console.error('Error rechecking admin status:', err);
+      
+      if (!navigator.onLine) {
+        setError('Tidak dapat memeriksa status admin karena Anda sedang offline');
+      } else {
+        setError(`Gagal memeriksa status admin: ${err.message || 'Unknown error'}`);
+      }
+      
+      // Set default in development mode
+      if (import.meta.env.DEV) {
+        setIsAdmin(true);
+      }
     }
   };
 
@@ -121,10 +168,30 @@ const AddAdmin: React.FC = () => {
           <CardTitle>Status Admin</CardTitle>
         </CardHeader>
         <CardContent>
+          {isOffline && (
+            <div className="mb-4 p-3 bg-amber-100 text-amber-700 rounded-md flex items-start">
+              <WifiOff className="h-5 w-5 mr-2 mt-0.5 flex-shrink-0" />
+              <p>Anda sedang offline. Beberapa fitur mungkin tidak berfungsi.</p>
+            </div>
+          )}
+          
           {error && (
             <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md flex items-start">
               <AlertCircle className="h-5 w-5 mr-2 mt-0.5 flex-shrink-0" />
-              <p>{error}</p>
+              <div>
+                <p>{error}</p>
+                {error.includes('Failed to fetch') && (
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={checkAdminStatus} 
+                    className="mt-2"
+                    disabled={isOffline}
+                  >
+                    Coba Lagi
+                  </Button>
+                )}
+              </div>
             </div>
           )}
           
@@ -144,7 +211,7 @@ const AddAdmin: React.FC = () => {
           {!isAdmin && (
             <Button
               onClick={makeAdmin}
-              disabled={loading}
+              disabled={loading || isOffline}
               className="bg-teal hover:bg-teal/90"
             >
               {loading ? 'Memproses...' : 'Jadikan Saya Admin'}
@@ -152,6 +219,12 @@ const AddAdmin: React.FC = () => {
           )}
         </CardContent>
       </Card>
+
+      {import.meta.env.DEV && (
+        <div className="text-xs text-gray-500 mt-2 p-2 border border-gray-200 rounded-md">
+          <p>Mode Pengembangan: Akses admin akan diberikan secara otomatis di lingkungan development.</p>
+        </div>
+      )}
     </div>
   );
 };
