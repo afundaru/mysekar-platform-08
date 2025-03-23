@@ -9,14 +9,14 @@ import AppRoutes from './routes/AppRoutes';
 function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <TooltipProvider>
+      <TooltipProvider>
+        <AuthProvider>
           <div className="App">
             <Toaster />
             <AppRoutes />
           </div>
-        </TooltipProvider>
-      </AuthProvider>
+        </AuthProvider>
+      </TooltipProvider>
     </BrowserRouter>
   );
 }
