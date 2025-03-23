@@ -43,6 +43,7 @@ function App() {
                 <Dashboard />
               </ProtectedRoute>
             } />
+            {/* Remove the Router from Profile.tsx since it's already wrapped here */}
             <Route path="/profile" element={
               <ProtectedRoute>
                 <Profile />

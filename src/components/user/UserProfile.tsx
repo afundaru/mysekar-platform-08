@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,7 +19,12 @@ import {
 // Fallback navigation function that uses window.location
 const useSafeNavigate = () => {
   try {
-    return useNavigate();
+    const navigate = useNavigate();
+    // Test the navigate function to make sure it's working
+    if (typeof navigate !== 'function') {
+      throw new Error('useNavigate did not return a function');
+    }
+    return navigate;
   } catch (error) {
     console.warn("React Router's useNavigate hook is not available, using fallback");
     return (path: string) => {
@@ -312,3 +316,4 @@ const UserProfile: React.FC = () => {
 };
 
 export default UserProfile;
+

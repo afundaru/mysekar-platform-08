@@ -1,6 +1,5 @@
 
 import React, { Suspense } from 'react';
-import { BrowserRouter as Router, useNavigate } from 'react-router-dom';
 import UserProfile from '@/components/user/UserProfile';
 import DashboardBottomNavigation from '@/components/DashboardBottomNavigation';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -62,6 +61,15 @@ const Profile: React.FC = () => {
             <UserProfileWithErrorBoundary />
           </Suspense>
         </ErrorBoundary>
+        
+        {/* Membership Card */}
+        <div className="mt-6">
+          <ErrorBoundary FallbackComponent={ErrorFallback}>
+            <Suspense fallback={<LoadingFallback />}>
+              <MembershipCard />
+            </Suspense>
+          </ErrorBoundary>
+        </div>
       </main>
       
       {/* Bottom Navigation */}
