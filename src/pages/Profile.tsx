@@ -29,21 +29,7 @@ const LoadingFallback = () => (
   </div>
 );
 
-// Separate component for the UserProfile to isolate routing issues
-const UserProfileWithErrorBoundary = () => {
-  return (
-    <ErrorBoundary 
-      FallbackComponent={ErrorFallback}
-      onReset={() => window.location.reload()}
-    >
-      <Suspense fallback={<LoadingFallback />}>
-        <UserProfile />
-      </Suspense>
-    </ErrorBoundary>
-  );
-};
-
-const Profile: React.FC = () => {
+const Profile = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Status Bar */}
@@ -56,9 +42,12 @@ const Profile: React.FC = () => {
       
       {/* Main Content */}
       <main className="p-4 pb-20">
-        <ErrorBoundary FallbackComponent={ErrorFallback}>
+        <ErrorBoundary 
+          FallbackComponent={ErrorFallback}
+          onReset={() => window.location.reload()}
+        >
           <Suspense fallback={<LoadingFallback />}>
-            <UserProfileWithErrorBoundary />
+            <UserProfile />
           </Suspense>
         </ErrorBoundary>
         
