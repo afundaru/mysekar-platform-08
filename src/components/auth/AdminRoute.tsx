@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState, useCallback, memo } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -13,6 +14,7 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
   const location = useLocation();
   const [checking, setChecking] = useState(true);
   const [hasAccess, setHasAccess] = useState(false);
+  const [networkError, setNetworkError] = useState(false);
 
   const verifyAdminStatus = useCallback(async () => {
     if (!user) {
@@ -38,6 +40,17 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
         }
       }
       
+      // Offline fallback - if network is unavailable but we have a previous status
+      if (!navigator.onLine && cachedStatus) {
+        const { status } = JSON.parse(cachedStatus);
+        console.log('Offline mode - using last known admin status:', status);
+        setHasAccess(status);
+        setChecking(false);
+        setNetworkError(true);
+        return;
+      }
+      
+      // Use a try/catch for the database request
       const { data, error } = await supabase
         .from('user_roles')
         .select('role')
@@ -47,11 +60,21 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
       
       if (error) {
         console.error('Error checking admin status:', error);
-        toast.error('Gagal memeriksa status admin: ' + error.message);
-        setHasAccess(false);
+        
+        // If it's a network error and we have cached status, use it
+        if (error.message?.includes('Failed to fetch') && cachedStatus) {
+          const { status } = JSON.parse(cachedStatus);
+          setHasAccess(status);
+          setNetworkError(true);
+          toast.error('Koneksi jaringan bermasalah, menggunakan status terakhir');
+        } else {
+          toast.error('Gagal memeriksa status admin: ' + error.message);
+          setHasAccess(false);
+        }
       } else {
         const isAdmin = !!data;
         setHasAccess(isAdmin);
+        setNetworkError(false);
         
         sessionStorage.setItem(cacheKey, JSON.stringify({
           status: isAdmin,
@@ -63,6 +86,8 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
     } catch (err) {
       console.error('Exception checking admin status:', err);
       setHasAccess(false);
+      setNetworkError(true);
+      toast.error('Terjadi kesalahan saat memeriksa status admin');
     } finally {
       setChecking(false);
     }
@@ -73,6 +98,23 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
       verifyAdminStatus();
     }
   }, [loading, verifyAdminStatus]);
+
+  // Add event listeners for online/offline status
+  useEffect(() => {
+    const handleOnline = () => {
+      console.log('App is online, refreshing admin status');
+      setNetworkError(false);
+      verifyAdminStatus();
+    };
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', () => setNetworkError(true));
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', () => setNetworkError(true));
+    };
+  }, [verifyAdminStatus]);
 
   if (loading || checking) {
     return (
@@ -85,6 +127,10 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
   if (!user) {
     toast.error("Anda harus login terlebih dahulu");
     return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  if (networkError) {
+    toast.warning("Mode offline: Menggunakan status admin terakhir yang diketahui");
   }
 
   if (!hasAccess) {
