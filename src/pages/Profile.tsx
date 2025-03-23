@@ -1,9 +1,11 @@
 
 import React, { Suspense } from 'react';
+import { BrowserRouter as Router } from 'react-router-dom';
 import UserProfile from '@/components/user/UserProfile';
 import DashboardBottomNavigation from '@/components/DashboardBottomNavigation';
 import { ErrorBoundary } from 'react-error-boundary';
 import DashboardHeader from '@/components/DashboardHeader';
+import MembershipCard from '@/components/MembershipCard';
 
 // Error fallback component
 const ErrorFallback = ({ error, resetErrorBoundary }) => {
@@ -28,6 +30,20 @@ const LoadingFallback = () => (
   </div>
 );
 
+// Separate component for the UserProfile to isolate routing issues
+const UserProfileWithErrorBoundary = () => {
+  return (
+    <ErrorBoundary 
+      FallbackComponent={ErrorFallback}
+      onReset={() => window.location.reload()}
+    >
+      <Suspense fallback={<LoadingFallback />}>
+        <UserProfile />
+      </Suspense>
+    </ErrorBoundary>
+  );
+};
+
 const Profile: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
@@ -43,7 +59,7 @@ const Profile: React.FC = () => {
       <main className="p-4 pb-20">
         <ErrorBoundary FallbackComponent={ErrorFallback}>
           <Suspense fallback={<LoadingFallback />}>
-            <UserProfile />
+            <UserProfileWithErrorBoundary />
           </Suspense>
         </ErrorBoundary>
       </main>

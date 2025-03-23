@@ -19,7 +19,19 @@ import {
 
 const UserProfile: React.FC = () => {
   const { user } = useAuth();
-  const navigate = useNavigate();
+  let navigate;
+  
+  try {
+    navigate = useNavigate();
+  } catch (error) {
+    // Fallback if navigate hook is not available
+    console.error("Navigation hook error:", error);
+    navigate = () => {
+      console.warn("Navigate function not available, using fallback");
+      window.location.href = '/dashboard';
+    };
+  }
+  
   const [editing, setEditing] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -29,6 +41,16 @@ const UserProfile: React.FC = () => {
   
   const memberData = user?.user_metadata || {};
 
+  // Function to handle going back to dashboard
+  const handleGoBack = () => {
+    try {
+      navigate('/dashboard');
+    } catch (error) {
+      console.error("Navigation error:", error);
+      window.location.href = '/dashboard';
+    }
+  };
+  
   // Function to handle file selection
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -123,7 +145,7 @@ const UserProfile: React.FC = () => {
         <Button 
           variant="ghost" 
           size="icon"
-          onClick={() => navigate('/dashboard')}
+          onClick={handleGoBack}
           className="mr-2"
         >
           <ArrowLeft className="h-5 w-5" />
