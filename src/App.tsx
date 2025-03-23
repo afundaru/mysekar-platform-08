@@ -10,7 +10,7 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <TooltipProvider delayDuration={0}>
+        <TooltipProvider>
           <div className="App">
             <Toaster />
             <AppRoutes />
