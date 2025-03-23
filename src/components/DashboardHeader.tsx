@@ -17,6 +17,11 @@ const DashboardHeader: React.FC = () => {
   // Get avatar URL from user metadata
   const avatarUrl = user?.user_metadata?.avatar_url || "https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-1.jpg";
   
+  const handleProfileClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    window.location.href = '/profile';
+  };
+  
   return (
     <header className="bg-white px-4 py-3 flex justify-between items-center shadow-sm">
       <a href="/profile" className="flex items-center space-x-3">
