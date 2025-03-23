@@ -21,7 +21,7 @@ const HeroBanner: React.FC = () => {
       <div className="absolute bottom-0 left-0 p-6 md:p-8 lg:p-10 text-white max-w-2xl">
         <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-2 animate-slide-up">Salam Solidaritas!</h1>
         <p className="text-sm md:text-base lg:text-lg mb-4 md:mb-6 animate-slide-up animate-delay-100 max-w-lg">
-          Platform digital terpadu untuk anggota serikat pekerja. Bersama kita maju, bersatu dalam teknologi.
+          Platform digital terpadu untuk anggota serikat pekerja SEKAR. Bersama kita maju, bersatu dalam teknologi.
         </p>
         <Button 
           onClick={handleJoinNow}
