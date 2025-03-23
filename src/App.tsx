@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'sonner';
@@ -26,9 +27,10 @@ import AnnouncementsList from '@/pages/AnnouncementsList';
 function App() {
   return (
     <div className="App">
-      <AuthProvider>
-        <Toaster />
-        <BrowserRouter>
+      {/* Make sure BrowserRouter wraps everything including the AuthProvider to ensure context is available everywhere */}
+      <BrowserRouter>
+        <AuthProvider>
+          <Toaster />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/announcements" element={<AnnouncementsList />} />
@@ -48,8 +50,8 @@ function App() {
             <Route path="/admin/*" element={<AdminRoute><AdminApp /></AdminRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
-        </BrowserRouter>
-      </AuthProvider>
+        </AuthProvider>
+      </BrowserRouter>
     </div>
   );
 }

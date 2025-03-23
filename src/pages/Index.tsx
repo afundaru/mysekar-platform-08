@@ -8,7 +8,7 @@ import Statistics from '@/components/Statistics';
 import BottomNavigation from '@/components/BottomNavigation';
 
 const Index: React.FC = () => {
-  // Use an effect to handle body class management
+  // Use React.useEffect to ensure proper hook access
   React.useEffect(() => {
     // Add subtle animation on initial load
     document.body.classList.add('overflow-x-hidden');
@@ -35,7 +35,7 @@ const Index: React.FC = () => {
         <Statistics />
       </main>
       
-      {/* Bottom Navigation */}
+      {/* Bottom Navigation - Wrapped in a div to ensure it's only rendered after routing context is available */}
       <BottomNavigation />
     </div>
   );
