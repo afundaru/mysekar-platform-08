@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Plus, Upload, Loader2 } from 'lucide-react';
+import { Plus, Upload, Loader2, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -9,6 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const categories = ["Upah", "PHK", "Pelecehan", "Kondisi Kerja", "Lainnya"];
 
@@ -25,10 +26,19 @@ const ComplaintSubmissionForm: React.FC<ComplaintSubmissionFormProps> = ({
   const [file, setFile] = useState<File | null>(null);
   const [isAnonymous, setIsAnonymous] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0]);
+      const selectedFile = e.target.files[0];
+      
+      // Check file size (limit to 5MB)
+      if (selectedFile.size > 5 * 1024 * 1024) {
+        toast.error("Ukuran file terlalu besar (maksimal 5MB)");
+        return;
+      }
+      
+      setFile(selectedFile);
     }
   };
 
@@ -38,6 +48,7 @@ const ComplaintSubmissionForm: React.FC<ComplaintSubmissionFormProps> = ({
       return;
     }
 
+    setError(null);
     setIsSubmitting(true);
     
     try {
@@ -51,6 +62,7 @@ const ComplaintSubmissionForm: React.FC<ComplaintSubmissionFormProps> = ({
       const userId = sessionData.session?.user.id;
       if (!userId) {
         toast.error("Anda harus login terlebih dahulu");
+        setError("Silakan login terlebih dahulu untuk mengirim pengaduan");
         return;
       }
 
@@ -69,6 +81,7 @@ const ComplaintSubmissionForm: React.FC<ComplaintSubmissionFormProps> = ({
         .single();
 
       if (complaintError) {
+        console.error('Error submitting complaint:', complaintError);
         throw complaintError;
       }
 
@@ -84,6 +97,7 @@ const ComplaintSubmissionForm: React.FC<ComplaintSubmissionFormProps> = ({
         if (uploadError) {
           console.error('Error uploading file:', uploadError);
           // Continue with successful complaint submission even if file upload fails
+          toast.warning("Berhasil mengirim pengaduan, namun gagal mengunggah file");
         } else {
           // Save attachment record
           const { error: attachmentError } = await supabase
@@ -111,8 +125,9 @@ const ComplaintSubmissionForm: React.FC<ComplaintSubmissionFormProps> = ({
       // Notify parent component to refresh complaints list
       onSubmitSuccess();
       
-    } catch (error) {
-      console.error('Error submitting complaint:', error);
+    } catch (err: any) {
+      console.error('Error submitting complaint:', err);
+      setError(err.message || "Gagal mengirim pengaduan. Silakan coba lagi nanti.");
       toast.error("Gagal mengirim pengaduan");
     } finally {
       setIsSubmitting(false);
@@ -120,9 +135,16 @@ const ComplaintSubmissionForm: React.FC<ComplaintSubmissionFormProps> = ({
   };
 
   return (
-    <div className="p-4 space-y-3">
+    <div className="p-4 space-y-4">
+      {error && (
+        <Alert variant="destructive" className="mb-4">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+      
       <Select onValueChange={setSelectedCategory} defaultValue={selectedCategory}>
-        <SelectTrigger>
+        <SelectTrigger className="w-full">
           <SelectValue placeholder="Pilih Kategori" />
         </SelectTrigger>
         <SelectContent>
@@ -143,14 +165,21 @@ const ComplaintSubmissionForm: React.FC<ComplaintSubmissionFormProps> = ({
         placeholder="Deskripsi Pengaduan"
         value={description}
         onChange={(e) => setDescription(e.target.value)}
-        className="min-h-[100px]"
+        className="min-h-[150px]"
       />
       
-      <label className="flex items-center gap-2 cursor-pointer p-2 border rounded hover:bg-gray-50">
-        <Upload className="h-4 w-4" />
-        <span className="text-sm">{file ? file.name : "Unggah Bukti"}</span>
-        <input type="file" className="hidden" onChange={handleFileChange} />
-      </label>
+      <div className="border border-dashed border-gray-300 rounded-lg p-4">
+        <label className="flex flex-col items-center gap-2 cursor-pointer">
+          <Upload className="h-6 w-6 text-gray-400" />
+          <span className="text-sm font-medium text-gray-700">
+            {file ? file.name : "Unggah Bukti Pendukung"}
+          </span>
+          <span className="text-xs text-gray-500">
+            {file ? `${(file.size / 1024 / 1024).toFixed(2)} MB` : "Maksimal 5MB"}
+          </span>
+          <input type="file" className="hidden" onChange={handleFileChange} />
+        </label>
+      </div>
       
       <div className="flex items-center gap-2">
         <Checkbox 

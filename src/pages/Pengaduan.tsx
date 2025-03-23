@@ -12,6 +12,8 @@ import ComplaintsList from '@/components/pengaduan/ComplaintsList';
 import PengaduanBottomNavigation from '@/components/pengaduan/PengaduanBottomNavigation';
 import ComplaintSubmissionForm from '@/components/pengaduan/ComplaintSubmissionForm';
 import ComplaintHistory from '@/components/pengaduan/ComplaintHistory';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Card } from '@/components/ui/card';
 
 interface Complaint {
   id: string;
@@ -27,6 +29,7 @@ const Pengaduan: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentView, setCurrentView] = useState<'list' | 'form' | 'history'>('list');
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -34,11 +37,16 @@ const Pengaduan: React.FC = () => {
   }, []);
 
   const fetchComplaints = async () => {
-    setIsLoading(true);
+    // If we're refreshing, don't show the full loading state again
+    if (!isRefreshing) {
+      setIsLoading(true);
+    } else {
+      setIsRefreshing(true);
+    }
     setError(null);
     
     try {
-      // Get user ID from session
+      // Check for an active session first
       const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
       
       if (sessionError) {
@@ -53,12 +61,22 @@ const Pengaduan: React.FC = () => {
       
       const userId = sessionData.session.user.id;
       
-      // Fetch complaints for the current user
-      const { data, error: complaintsError } = await supabase
+      // Fetch complaints with a timeout for better error handling
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Waktu permintaan habis. Periksa koneksi internet Anda.')), 15000)
+      );
+      
+      const fetchPromise = supabase
         .from('complaints')
         .select('*')
         .eq('user_id', userId)
         .order('created_at', { ascending: false });
+      
+      // Use Promise.race to implement a timeout
+      const { data, error: complaintsError } = await Promise.race([
+        fetchPromise,
+        timeoutPromise.then(() => { throw new Error('Network timeout'); })
+      ]) as any;
       
       if (complaintsError) {
         console.error('Error fetching complaints:', complaintsError);
@@ -72,6 +90,7 @@ const Pengaduan: React.FC = () => {
       toast.error('Gagal memuat data pengaduan');
     } finally {
       setIsLoading(false);
+      setIsRefreshing(false);
     }
   };
 
@@ -103,24 +122,37 @@ const Pengaduan: React.FC = () => {
           />
           
           {isLoading ? (
-            <div className="flex flex-col justify-center items-center py-10 px-4">
-              <Loader2 className="h-8 w-8 animate-spin text-teal mb-2" />
-              <span className="text-gray-600">Memuat data pengaduan...</span>
+            <div className="p-4 space-y-3">
+              <Skeleton className="h-12 w-full mb-4" />
+              <Skeleton className="h-24 w-full mb-3" />
+              <Skeleton className="h-24 w-full mb-3" />
+              <Skeleton className="h-24 w-full" />
             </div>
           ) : error ? (
             <div className="p-4">
-              <Alert variant="destructive" className="mb-4">
-                <AlertCircle className="h-4 w-4" />
-                <AlertTitle>Error</AlertTitle>
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-              <Button 
-                variant="outline" 
-                onClick={fetchComplaints}
-                className="w-full mt-2"
-              >
-                Coba Lagi
-              </Button>
+              <Card className="p-6 mb-4 bg-red-50 border-red-200">
+                <div className="flex flex-col items-center text-center">
+                  <AlertCircle className="h-10 w-10 text-red-500 mb-2" />
+                  <h3 className="text-lg font-semibold text-red-700 mb-1">Error</h3>
+                  <p className="text-red-600 mb-4">{error}</p>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => {
+                      setIsRefreshing(true);
+                      fetchComplaints();
+                    }}
+                    className="w-full md:w-auto"
+                    disabled={isRefreshing}
+                  >
+                    {isRefreshing ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                        Memuat ulang...
+                      </>
+                    ) : 'Coba Lagi'}
+                  </Button>
+                </div>
+              </Card>
             </div>
           ) : (
             <ComplaintsList 
@@ -147,7 +179,7 @@ const Pengaduan: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-16">
+    <div className="min-h-screen bg-gray-50 pb-20">
       <PengaduanHeader 
         title={
           currentView === 'list' 
