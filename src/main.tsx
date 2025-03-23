@@ -5,6 +5,9 @@ import App from './App.tsx'
 import './index.css'
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import { toast } from 'sonner';
+import { BrowserRouter as Router } from 'react-router-dom';
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { AuthProvider } from '@/contexts/AuthContext';
 
 // Make sure we're using the correct element for mounting
 const rootElement = document.getElementById('root');
@@ -16,9 +19,19 @@ if (!rootElement) {
 // Create root outside of render to help with debugging
 const root = ReactDOM.createRoot(rootElement);
 
-// Mount the application without extra StrictMode 
-// (since we've moved it into App.tsx)
-root.render(<App />);
+// Mount the application with all providers at the root level
+// This ensures contexts are available throughout the application
+root.render(
+  <React.StrictMode>
+    <Router>
+      <TooltipProvider>
+        <AuthProvider>
+          <App />
+        </AuthProvider>
+      </TooltipProvider>
+    </Router>
+  </React.StrictMode>
+);
 
 // Register service worker for offline support
 serviceWorkerRegistration.register({

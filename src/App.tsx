@@ -1,26 +1,15 @@
 
 import React from 'react';
-import { BrowserRouter as Router } from 'react-router-dom';
 import { Toaster } from 'sonner';
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { AuthProvider } from '@/contexts/AuthContext';
 import AppRoutes from './routes/AppRoutes';
 
 function App() {
   console.log("App rendering");
   return (
-    <React.StrictMode>
-      <Router>
-        <TooltipProvider>
-          <AuthProvider>
-            <div className="App">
-              <Toaster />
-              <AppRoutes />
-            </div>
-          </AuthProvider>
-        </TooltipProvider>
-      </Router>
-    </React.StrictMode>
+    <div className="App">
+      <Toaster />
+      <AppRoutes />
+    </div>
   );
 }
 
