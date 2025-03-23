@@ -6,7 +6,7 @@ import './index.css'
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import { toast } from 'sonner';
 import { BrowserRouter as Router } from 'react-router-dom';
-import * as TooltipPrimitive from "@radix-ui/react-tooltip"
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from '@/contexts/AuthContext';
 
 // Make sure we're using the correct element for mounting
@@ -22,13 +22,13 @@ const root = ReactDOM.createRoot(rootElement);
 // Proper provider nesting to ensure React context works correctly
 root.render(
   <React.StrictMode>
-    <TooltipPrimitive.Provider>
-      <Router>
+    <Router>
+      <TooltipProvider>
         <AuthProvider>
           <App />
         </AuthProvider>
-      </Router>
-    </TooltipPrimitive.Provider>
+      </TooltipProvider>
+    </Router>
   </React.StrictMode>
 );
 
