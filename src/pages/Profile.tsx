@@ -31,44 +31,45 @@ const LoadingFallback = () => (
 );
 
 const Profile = () => {
-  // The issue is that we're using useNavigate in UserProfile but it's not within a Router context
-  // We need to ensure Router context is available
+  // We need to ensure Router context is available for components that use router hooks
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Status Bar */}
-      <div className="bg-teal h-6"></div>
-      
-      {/* Header */}
-      <ErrorBoundary FallbackComponent={ErrorFallback}>
-        <DashboardHeader />
-      </ErrorBoundary>
-      
-      {/* Main Content */}
-      <main className="p-4 pb-20">
-        <ErrorBoundary 
-          FallbackComponent={ErrorFallback}
-          onReset={() => window.location.reload()}
-        >
-          <Suspense fallback={<LoadingFallback />}>
-            <UserProfile />
-          </Suspense>
+    <BrowserRouter>
+      <div className="min-h-screen bg-gray-50">
+        {/* Status Bar */}
+        <div className="bg-teal h-6"></div>
+        
+        {/* Header */}
+        <ErrorBoundary FallbackComponent={ErrorFallback}>
+          <DashboardHeader />
         </ErrorBoundary>
         
-        {/* Membership Card */}
-        <div className="mt-6">
-          <ErrorBoundary FallbackComponent={ErrorFallback}>
+        {/* Main Content */}
+        <main className="p-4 pb-20">
+          <ErrorBoundary 
+            FallbackComponent={ErrorFallback}
+            onReset={() => window.location.reload()}
+          >
             <Suspense fallback={<LoadingFallback />}>
-              <MembershipCard />
+              <UserProfile />
             </Suspense>
           </ErrorBoundary>
-        </div>
-      </main>
-      
-      {/* Bottom Navigation */}
-      <ErrorBoundary FallbackComponent={ErrorFallback}>
-        <DashboardBottomNavigation />
-      </ErrorBoundary>
-    </div>
+          
+          {/* Membership Card */}
+          <div className="mt-6">
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <Suspense fallback={<LoadingFallback />}>
+                <MembershipCard />
+              </Suspense>
+            </ErrorBoundary>
+          </div>
+        </main>
+        
+        {/* Bottom Navigation */}
+        <ErrorBoundary FallbackComponent={ErrorFallback}>
+          <DashboardBottomNavigation />
+        </ErrorBoundary>
+      </div>
+    </BrowserRouter>
   );
 };
 
