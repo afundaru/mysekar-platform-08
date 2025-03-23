@@ -28,7 +28,7 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
       const cacheKey = `admin_status_${user.id}`;
       const cachedStatus = sessionStorage.getItem(cacheKey);
       
-      // Always grant admin access in development mode to facilitate testing
+      // Always grant admin access in development mode
       if (import.meta.env.DEV) {
         console.log('Development mode - granting admin access for development purposes');
         setHasAccess(true);
@@ -43,7 +43,7 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
       
       if (cachedStatus) {
         const { status, timestamp } = JSON.parse(cachedStatus);
-        const isRecent = Date.now() - timestamp < 5 * 60 * 1000;
+        const isRecent = Date.now() - timestamp < 5 * 60 * 1000; // 5 minutes
         
         if (isRecent) {
           console.log('Using cached admin status:', status);
@@ -72,15 +72,34 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
       }
       
       try {
-        // Use a try/catch for the database request
-        const { data, error } = await supabase
+        // Add a timeout to prevent UI freezing
+        const timeoutPromise = new Promise<{data: null, error: Error}>((_, reject) => {
+          setTimeout(() => reject(new Error('Request timeout')), 3000);
+        });
+        
+        const fetchPromise = supabase
           .from('user_roles')
           .select('role')
           .eq('user_id', user.id)
           .eq('role', 'admin')
           .maybeSingle();
         
+        const { data, error } = await Promise.race([fetchPromise, timeoutPromise]);
+        
         if (error) {
+          // If it's a timeout error, use the cached state
+          if (error.message === 'Request timeout') {
+            console.warn('Admin check timed out, using cached state');
+            if (cachedStatus) {
+              const { status } = JSON.parse(cachedStatus);
+              setHasAccess(status);
+            } else if (import.meta.env.DEV) {
+              setHasAccess(true);
+            }
+            setNetworkError(true);
+            setChecking(false);
+            return;
+          }
           throw error;
         }
         

@@ -34,8 +34,6 @@ const LoadingFallback = () => (
 );
 
 const Profile = () => {
-  console.log("Profile page rendering");
-  
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Status Bar */}

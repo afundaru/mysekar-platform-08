@@ -33,7 +33,6 @@ const AuthContext = createContext<AuthContextType>({
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   console.log("AuthProvider rendering");
   
-  // Pastikan useState digunakan dalam lingkup komponen React
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
@@ -46,9 +45,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!user) return false;
     
     try {
-      // Very short timeout (3 seconds) to avoid UI freezing
+      // Shorter timeout (2 seconds) to avoid UI freezing
       const timeoutPromise = new Promise<{data: null, error: Error}>((_, reject) => {
-        setTimeout(() => reject(new Error('Request timeout')), 3000);
+        setTimeout(() => reject(new Error('Request timeout')), 2000);
       });
       
       const fetchPromise = supabase
@@ -62,7 +61,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (error) {
         console.error('Error checking admin status:', error);
-        // If it's a timeout error, use the cached state
+        // If it's a timeout error, use the cached state instead of failing
         if (error.message === 'Request timeout') {
           console.warn('Admin check timed out, using cached state');
           return isAdmin;
@@ -76,6 +75,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return isUserAdmin;
     } catch (error) {
       console.error('Error checking admin status:', error);
+      // Use cached value if available instead of breaking the UI
       return isAdmin;
     }
   }, [user, isAdmin]);
@@ -90,7 +90,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.log("Setting up authentication...");
         setLoading(true);
         
-        // Set up the auth state change listener
+        // Set up the auth state change listener first
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
           async (event, currentSession) => {
             if (!mounted) return;
@@ -101,7 +101,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setUser(currentSession?.user ?? null);
             
             if (currentSession?.user) {
-              // Set a default user role immediately to prevent null roles
+              // Set a default user role immediately
               setUserRole('user');
               
               // Then check admin status in the background
@@ -109,6 +109,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 await checkIsAdmin();
               } catch (e) {
                 console.error('Failed to check admin status after auth change:', e);
+                // Continue with default role if admin check fails
               }
             } else {
               setIsAdmin(false);
@@ -119,8 +120,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
         );
 
+        // Then get the initial session
         try {
-          // Get any existing session
           const { data: { session: currentSession } } = await supabase.auth.getSession();
           
           if (!mounted) return;
@@ -132,7 +133,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           
           if (currentSession?.user) {
             console.log('User found in session:', currentSession.user.email);
-            // Set a default user role immediately to prevent null roles
+            // Set a default user role immediately
             setUserRole('user');
             
             // Then check admin status in the background
@@ -140,6 +141,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               await checkIsAdmin();
             } catch (e) {
               console.error('Failed to check admin status on initial load:', e);
+              // Continue with default role if admin check fails
             }
           } else {
             console.log('No user found in initial session');
@@ -155,6 +157,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
         }
         
+        // Clean up function
         return () => {
           subscription.unsubscribe();
         };
@@ -174,6 +177,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, [checkIsAdmin]);
 
+  // Sign out function
   const signOut = async () => {
     try {
       setLoading(true);
