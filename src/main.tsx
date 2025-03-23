@@ -6,10 +6,21 @@ import './index.css'
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import { toast } from 'sonner';
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
+// Make sure we're using the correct element for mounting
+const rootElement = document.getElementById('root');
+
+if (!rootElement) {
+  throw new Error('Root element not found. Make sure there is a div with id "root" in your HTML file.');
+}
+
+// Create root outside of render to help with debugging
+const root = ReactDOM.createRoot(rootElement);
+
+// Mount the application
+root.render(
   <React.StrictMode>
     <App />
-  </React.StrictMode>,
+  </React.StrictMode>
 )
 
 // Register service worker for offline support

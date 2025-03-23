@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,21 +17,47 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 
-// Fallback navigation function that uses window.location
+// Enhanced safe navigation hook that doesn't rely on React Router context
+// if it's not available
 const useSafeNavigate = () => {
+  // State to track if we're using the fallback
+  const [usingFallback, setUsingFallback] = useState(false);
+
+  // Initialize navigation function
+  let navigate = (path: string) => {
+    console.log("Using window.location fallback navigation to:", path);
+    window.location.href = path;
+  };
+
+  // Try to use React Router's navigate if available
   try {
-    const navigate = useNavigate();
-    // Test the navigate function to make sure it's working
-    if (typeof navigate !== 'function') {
-      throw new Error('useNavigate did not return a function');
+    // This will throw if not in Router context
+    const routerNavigate = useNavigate();
+    
+    if (typeof routerNavigate === 'function') {
+      navigate = (path: string) => {
+        console.log("Using react-router navigation to:", path);
+        routerNavigate(path);
+      };
+    } else {
+      setUsingFallback(true);
+      console.warn("useNavigate did not return a function, using fallback");
     }
-    return navigate;
   } catch (error) {
+    setUsingFallback(true);
     console.warn("React Router's useNavigate hook is not available, using fallback");
-    return (path: string) => {
-      window.location.href = path;
-    };
   }
+
+  // Log navigation status on mount
+  useEffect(() => {
+    if (usingFallback) {
+      console.log("Navigation is using window.location.href fallback");
+    } else {
+      console.log("Navigation is using React Router");
+    }
+  }, [usingFallback]);
+
+  return navigate;
 };
 
 const UserProfile: React.FC = () => {
@@ -48,6 +75,7 @@ const UserProfile: React.FC = () => {
 
   // Function to handle going back to dashboard
   const handleGoBack = () => {
+    console.log("Navigating back to dashboard");
     try {
       navigate('/dashboard');
     } catch (error) {
@@ -208,11 +236,11 @@ const UserProfile: React.FC = () => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="center">
-                  <DropdownMenuItem onClick={handleGalleryClick}>
+                  <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
                     <ImageIcon className="mr-2 h-4 w-4" />
                     <span>Pilih dari Galeri</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleCameraClick}>
+                  <DropdownMenuItem onClick={() => cameraInputRef.current?.click()}>
                     <Camera className="mr-2 h-4 w-4" />
                     <span>Ambil Foto</span>
                   </DropdownMenuItem>
@@ -222,14 +250,120 @@ const UserProfile: React.FC = () => {
               <input 
                 type="file" 
                 ref={fileInputRef} 
-                onChange={handleFileChange} 
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (!file || !user) return;
+                  
+                  setUploading(true);
+                  setError(null);
+                  
+                  try {
+                    // Generate a unique file name
+                    const fileExt = file.name.split('.').pop();
+                    const fileName = `${user.id}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+                    const filePath = `${fileName}`;
+                    
+                    // Check file size (max 5MB)
+                    if (file.size > 5 * 1024 * 1024) {
+                      throw new Error('File too large. Maximum size is 5MB.');
+                    }
+                    
+                    // Upload the file to Supabase Storage
+                    supabase.storage
+                      .from('avatars')
+                      .upload(filePath, file)
+                      .then(({ error: uploadError, data }) => {
+                        if (uploadError) throw uploadError;
+                        
+                        // Get the public URL
+                        const { data: publicUrlData } = supabase.storage.from('avatars').getPublicUrl(filePath);
+                        
+                        // Update user metadata with avatar URL
+                        return supabase.auth.updateUser({
+                          data: { avatar_url: publicUrlData.publicUrl }
+                        });
+                      })
+                      .then(({ error: updateError, data }) => {
+                        if (updateError) throw updateError;
+                        
+                        setAvatarUrl(data?.user?.user_metadata?.avatar_url || null);
+                        toast.success("Foto profil berhasil diperbarui");
+                      })
+                      .catch((error) => {
+                        console.error('Error uploading avatar:', error);
+                        setError(error.message || "Gagal mengunggah foto profil");
+                        toast.error(error.message || "Gagal mengunggah foto profil");
+                      })
+                      .finally(() => {
+                        setUploading(false);
+                      });
+                  } catch (error: any) {
+                    console.error('Error processing avatar:', error);
+                    setError(error.message || "Gagal memproses foto profil");
+                    toast.error(error.message || "Gagal memproses foto profil");
+                    setUploading(false);
+                  }
+                }}
                 accept="image/*" 
                 className="hidden" 
               />
               <input 
                 type="file" 
                 ref={cameraInputRef} 
-                onChange={handleFileChange} 
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (!file || !user) return;
+                  
+                  setUploading(true);
+                  setError(null);
+                  
+                  try {
+                    // Generate a unique file name
+                    const fileExt = file.name.split('.').pop();
+                    const fileName = `${user.id}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+                    const filePath = `${fileName}`;
+                    
+                    // Check file size (max 5MB)
+                    if (file.size > 5 * 1024 * 1024) {
+                      throw new Error('File too large. Maximum size is 5MB.');
+                    }
+                    
+                    // Upload the file to Supabase Storage
+                    supabase.storage
+                      .from('avatars')
+                      .upload(filePath, file)
+                      .then(({ error: uploadError, data }) => {
+                        if (uploadError) throw uploadError;
+                        
+                        // Get the public URL
+                        const { data: publicUrlData } = supabase.storage.from('avatars').getPublicUrl(filePath);
+                        
+                        // Update user metadata with avatar URL
+                        return supabase.auth.updateUser({
+                          data: { avatar_url: publicUrlData.publicUrl }
+                        });
+                      })
+                      .then(({ error: updateError, data }) => {
+                        if (updateError) throw updateError;
+                        
+                        setAvatarUrl(data?.user?.user_metadata?.avatar_url || null);
+                        toast.success("Foto profil berhasil diperbarui");
+                      })
+                      .catch((error) => {
+                        console.error('Error uploading avatar:', error);
+                        setError(error.message || "Gagal mengunggah foto profil");
+                        toast.error(error.message || "Gagal mengunggah foto profil");
+                      })
+                      .finally(() => {
+                        setUploading(false);
+                      });
+                  } catch (error: any) {
+                    console.error('Error processing avatar:', error);
+                    setError(error.message || "Gagal memproses foto profil");
+                    toast.error(error.message || "Gagal memproses foto profil");
+                    setUploading(false);
+                  }
+                }}
                 accept="image/*" 
                 capture="user" 
                 className="hidden" 
@@ -315,5 +449,28 @@ const UserProfile: React.FC = () => {
   );
 };
 
-export default UserProfile;
+// Load avatar URL from user metadata on component mount
+useEffect(() => {
+  if (user?.user_metadata?.avatar_url) {
+    setAvatarUrl(user.user_metadata.avatar_url);
+  }
+}, [user]);
 
+// Handle offline state
+useEffect(() => {
+  const handleOnlineStatus = () => {
+    if (!navigator.onLine) {
+      toast.warning("Anda sedang offline. Beberapa fitur mungkin tidak tersedia.");
+    }
+  };
+  
+  window.addEventListener('online', handleOnlineStatus);
+  window.addEventListener('offline', handleOnlineStatus);
+  
+  return () => {
+    window.removeEventListener('online', handleOnlineStatus);
+    window.removeEventListener('offline', handleOnlineStatus);
+  };
+}, []);
+
+export default UserProfile;
