@@ -29,14 +29,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isAdmin, setIsAdmin] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
-  // Reduced timeout for admin check to prevent long waits
+  // Reduced timeout and improved error handling for admin check
   const checkIsAdmin = useCallback(async (): Promise<boolean> => {
     if (!user) return false;
     
     try {
-      // Reduce timeout to 5 seconds to avoid UI freezing for too long
+      // Very short timeout (3 seconds) to avoid UI freezing
       const timeoutPromise = new Promise<{data: null, error: Error}>((_, reject) => {
-        setTimeout(() => reject(new Error('Request timeout')), 5000);
+        setTimeout(() => reject(new Error('Request timeout')), 3000);
       });
       
       const fetchPromise = supabase
@@ -69,18 +69,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [user, isAdmin]);
 
   useEffect(() => {
+    let mounted = true; // Flag to track if component is mounted
+    
     const setupAuth = async () => {
+      if (!mounted) return;
+      
       try {
-        // Set up the auth state change listener FIRST
+        console.log("Setting up authentication...");
+        setLoading(true);
+        
+        // Set up the auth state change listener
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
           async (event, currentSession) => {
+            if (!mounted) return;
+            
             console.log('Auth event:', event);
             
             setSession(currentSession);
             setUser(currentSession?.user ?? null);
             
             if (currentSession?.user) {
-              // Set a default user role immediately
+              // Set a default user role immediately to prevent null roles
               setUserRole('user');
               
               // Then check admin status in the background
@@ -98,45 +107,67 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
         );
 
-        // THEN check for any existing session
-        const { data: { session: currentSession } } = await supabase.auth.getSession();
-        setSession(currentSession);
-        setUser(currentSession?.user ?? null);
-        
-        if (currentSession?.user) {
-          // Set a default user role immediately
-          setUserRole('user');
+        try {
+          // Get any existing session
+          const { data: { session: currentSession } } = await supabase.auth.getSession();
           
-          // Then check admin status in the background
-          try {
-            await checkIsAdmin();
-          } catch (e) {
-            console.error('Failed to check admin status on initial load:', e);
+          if (!mounted) return;
+          
+          setSession(currentSession);
+          setUser(currentSession?.user ?? null);
+          
+          if (currentSession?.user) {
+            // Set a default user role immediately to prevent null roles
+            setUserRole('user');
+            
+            // Then check admin status in the background
+            try {
+              await checkIsAdmin();
+            } catch (e) {
+              console.error('Failed to check admin status on initial load:', e);
+            }
+          }
+        } catch (e) {
+          console.error('Error getting initial session:', e);
+          if (mounted) {
+            setError(e instanceof Error ? e : new Error('Unknown error getting session'));
+          }
+        } finally {
+          if (mounted) {
+            setLoading(false);
           }
         }
         
-        setLoading(false);
-        
         return () => {
           subscription.unsubscribe();
+          mounted = false;
         };
       } catch (e) {
         console.error('Error setting up auth:', e);
-        setLoading(false);
-        setError(e instanceof Error ? e : new Error('Unknown error setting up auth'));
+        if (mounted) {
+          setLoading(false);
+          setError(e instanceof Error ? e : new Error('Unknown error setting up auth'));
+        }
       }
     };
     
     setupAuth();
+    
+    return () => {
+      mounted = false; // Cleanup
+    };
   }, [checkIsAdmin]);
 
   const signOut = async () => {
     try {
+      setLoading(true);
       await supabase.auth.signOut();
       toast.success('Berhasil keluar dari sistem');
     } catch (error) {
       console.error('Error signing out:', error);
       toast.error('Gagal keluar dari sistem');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -144,6 +175,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return email.endsWith('@bankraya.co.id');
   }, []);
 
+  // Memoize context value to prevent unnecessary rerenders
   const value = useMemo(() => ({
     session,
     user,
@@ -154,6 +186,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     isValidEmail,
     checkIsAdmin
   }), [session, user, loading, userRole, isAdmin, checkIsAdmin, isValidEmail]);
+
+  console.log("AuthContext rendering state:", { 
+    hasUser: !!user, 
+    userEmail: user?.email || 'none', 
+    loading, 
+    role: userRole 
+  });
 
   if (error) {
     return (

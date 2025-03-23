@@ -19,6 +19,17 @@ interface ProfileAvatarProps {
 }
 
 const ProfileAvatar: React.FC<ProfileAvatarProps> = ({ user, avatarUrl, setAvatarUrl }) => {
+  // Ensure user exists before using hooks
+  if (!user) {
+    return (
+      <div className="relative mr-4">
+        <Avatar className="h-16 w-16">
+          <AvatarFallback>U</AvatarFallback>
+        </Avatar>
+      </div>
+    );
+  }
+  
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);

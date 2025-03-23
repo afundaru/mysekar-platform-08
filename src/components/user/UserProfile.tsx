@@ -11,11 +11,12 @@ import MembershipInfo from './MembershipInfo';
 import { useNavigate } from 'react-router-dom';
 
 const UserProfile: React.FC = () => {
+  // Move hooks to the top level of the component
+  const navigate = useNavigate();
   const { user, loading } = useAuth();
   const [editing, setEditing] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate();
   
   // Function to handle going back to dashboard
   const handleGoBack = () => {
@@ -46,17 +47,21 @@ const UserProfile: React.FC = () => {
       window.removeEventListener('offline', handleOnlineStatus);
     };
   }, []);
+
+  console.log("UserProfile rendering state:", { 
+    userExists: !!user, 
+    loading, 
+    editing,
+    userEmail: user?.email || 'none'
+  });
   
-  if (editing) {
-    return <ProfileEditForm onCancel={() => setEditing(false)} />;
-  }
-  
-  // Show loading state while auth is being initialized
+  // Separate the rendering logic based on state
   if (loading) {
     return (
       <div className="w-full max-w-md mx-auto p-4">
         <div className="flex justify-center items-center h-48">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal"></div>
+          <p className="ml-2">Memuat data...</p>
         </div>
       </div>
     );
@@ -75,7 +80,9 @@ const UserProfile: React.FC = () => {
     );
   }
   
-  console.log("User data in UserProfile:", user); // Debug logging
+  if (editing) {
+    return <ProfileEditForm onCancel={() => setEditing(false)} />;
+  }
   
   return (
     <div className="w-full max-w-md mx-auto">
