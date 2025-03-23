@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import {
   Sidebar,
   SidebarContent,
@@ -14,6 +14,8 @@ import { LayoutDashboard, Users, MessageSquare, Flag, Gavel, LogOut, ShieldCheck
 import SignOutButton from "@/components/auth/SignOutButton";
 
 const AdminSidebar = () => {
+  const location = useLocation();
+  
   return (
     <Sidebar className="border-r" side="left">
       <SidebarHeader className="border-b p-4">
@@ -25,7 +27,7 @@ const AdminSidebar = () => {
       <SidebarContent>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild tooltip="Dashboard">
+            <SidebarMenuButton asChild tooltip="Dashboard" className={location.pathname === "/admin" ? "bg-teal/10" : ""}>
               <Link to="/admin">
                 <LayoutDashboard />
                 <span>Dashboard</span>
@@ -33,7 +35,7 @@ const AdminSidebar = () => {
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild tooltip="Keanggotaan">
+            <SidebarMenuButton asChild tooltip="Keanggotaan" className={location.pathname === "/admin/keanggotaan" ? "bg-teal/10" : ""}>
               <Link to="/admin/keanggotaan">
                 <Users />
                 <span>Keanggotaan</span>
@@ -41,7 +43,7 @@ const AdminSidebar = () => {
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild tooltip="Forum">
+            <SidebarMenuButton asChild tooltip="Forum" className={location.pathname === "/admin/forum" ? "bg-teal/10" : ""}>
               <Link to="/admin/forum">
                 <MessageSquare />
                 <span>Forum & Komunikasi</span>
@@ -49,7 +51,7 @@ const AdminSidebar = () => {
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild tooltip="Pengaduan">
+            <SidebarMenuButton asChild tooltip="Pengaduan" className={location.pathname === "/admin/pengaduan" ? "bg-teal/10" : ""}>
               <Link to="/admin/pengaduan">
                 <Flag />
                 <span>Pengaduan</span>
@@ -57,7 +59,7 @@ const AdminSidebar = () => {
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild tooltip="Konsultasi">
+            <SidebarMenuButton asChild tooltip="Konsultasi" className={location.pathname === "/admin/konsultasi" ? "bg-teal/10" : ""}>
               <Link to="/admin/konsultasi">
                 <Gavel />
                 <span>Konsultasi Hukum</span>
@@ -65,7 +67,7 @@ const AdminSidebar = () => {
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild tooltip="Kelola Admin">
+            <SidebarMenuButton asChild tooltip="Kelola Admin" className={location.pathname === "/admin/add-admin" ? "bg-teal/10" : ""}>
               <Link to="/admin/add-admin">
                 <ShieldCheck />
                 <span>Kelola Admin</span>
