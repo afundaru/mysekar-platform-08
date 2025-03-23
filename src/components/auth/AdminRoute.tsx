@@ -23,6 +23,9 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
       }
 
       try {
+        // Log for debugging
+        console.log("Checking admin status for user:", user.id, "at path:", location.pathname);
+        
         // Langsung periksa ke database untuk status admin terbaru
         const { data, error } = await supabase
           .from('user_roles')
@@ -50,7 +53,7 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
     if (!loading) {
       verifyAdminStatus();
     }
-  }, [user, loading]);
+  }, [user, loading, location.pathname]); // Added location.pathname to dependencies
 
   // Jika masih loading atau sedang memeriksa status admin, tampilkan loading
   if (loading || checking) {

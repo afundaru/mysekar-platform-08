@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Routes, Route, Link, Navigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
@@ -221,6 +222,9 @@ const Konsultasi = () => {
 };
 
 const AdminApp = () => {
+  // Add console.log to help debug
+  console.log("AdminApp rendered, pathname:", window.location.pathname);
+  
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full">
@@ -235,7 +239,8 @@ const AdminApp = () => {
               <Route path="pengaduan" element={<Pengaduan />} />
               <Route path="konsultasi" element={<Konsultasi />} />
               <Route path="add-admin" element={<AddAdmin />} />
-              <Route path="*" element={<Navigate to="/admin" replace />} />
+              {/* Fix redirect path - remove leading slash */}
+              <Route path="*" element={<Navigate to="" replace />} />
             </Routes>
           </main>
         </div>
