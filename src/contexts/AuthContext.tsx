@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -29,7 +30,7 @@ const AuthContext = createContext<AuthContextType>({
 });
 
 // Export the AuthProvider component
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   console.log("AuthProvider rendering");
   
   const [user, setUser] = useState<User | null>(null);

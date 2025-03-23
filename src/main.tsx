@@ -19,7 +19,7 @@ if (!rootElement) {
 // Create root outside of render to help with debugging
 const root = ReactDOM.createRoot(rootElement);
 
-// Fix provider hierarchy - Router first, then AuthProvider, then TooltipProvider
+// React StrictMode should wrap everything
 root.render(
   <React.StrictMode>
     <Router>
