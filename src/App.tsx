@@ -8,9 +8,29 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 
-// Lazy load pages for better performance
-const Index = lazy(() => import("./pages/Index"));
-const Login = lazy(() => import("./pages/Login"));
+// Loading fallback component
+const LoadingFallback = () => (
+  <div className="flex items-center justify-center min-h-screen">
+    <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-teal"></div>
+  </div>
+);
+
+// Lazy load pages for better performance with error handling
+const Index = lazy(() => 
+  import("./pages/Index").catch(err => {
+    console.error("Error loading Index page:", err);
+    return { default: () => <div>Error loading page</div> };
+  })
+);
+
+const Login = lazy(() => 
+  import("./pages/Login").catch(err => {
+    console.error("Error loading Login page:", err);
+    return { default: () => <div>Error loading page</div> };
+  })
+);
+
+// ... load other pages with the same pattern
 const Register = lazy(() => import("./pages/Register"));
 const OtpVerification = lazy(() => import("./pages/OtpVerification"));
 const RegistrationSuccess = lazy(() => import("./pages/RegistrationSuccess"));
@@ -23,13 +43,6 @@ const Profile = lazy(() => import("./pages/Profile"));
 const ForumDiskusi = lazy(() => import("./pages/ForumDiskusi"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Admin = lazy(() => import("./pages/admin"));
-
-// Loading fallback component
-const LoadingFallback = () => (
-  <div className="flex items-center justify-center min-h-screen">
-    <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-teal"></div>
-  </div>
-);
 
 // Initialize React Query with performance optimizations
 const queryClient = new QueryClient({

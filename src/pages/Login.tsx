@@ -10,7 +10,7 @@ import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 import AuthLayout from '@/components/auth/AuthLayout';
 
-const Login: React.FC = () => {
+const Login = () => {
   const navigate = useNavigate();
   const { isValidEmail } = useAuth();
   const [email, setEmail] = useState('');
@@ -22,9 +22,13 @@ const Login: React.FC = () => {
   // Check if user is already logged in
   useEffect(() => {
     const checkSession = async () => {
-      const { data } = await supabase.auth.getSession();
-      if (data.session) {
-        navigate('/dashboard');
+      try {
+        const { data } = await supabase.auth.getSession();
+        if (data.session) {
+          navigate('/dashboard');
+        }
+      } catch (error) {
+        console.error("Error checking session:", error);
       }
     };
     
