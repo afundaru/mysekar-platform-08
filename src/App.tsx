@@ -19,17 +19,14 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import AdminRoute from '@/components/auth/AdminRoute';
 import AdminApp from '@/pages/admin/AdminApp';
-
-// Add import for the announcement pages
 import AnnouncementDetails from '@/pages/AnnouncementDetails';
 import AnnouncementsList from '@/pages/AnnouncementsList';
 
 function App() {
   return (
-    <div className="App">
-      {/* Make sure BrowserRouter wraps everything including the AuthProvider to ensure context is available everywhere */}
-      <BrowserRouter>
-        <AuthProvider>
+    <BrowserRouter>
+      <AuthProvider>
+        <div className="App">
           <Toaster />
           <Routes>
             <Route path="/" element={<Index />} />
@@ -40,19 +37,52 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/otp-verification" element={<OtpVerification />} />
             <Route path="/registration-success" element={<RegistrationSuccess />} />
-            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-            <Route path="/forum" element={<ProtectedRoute><ForumDiskusi /></ProtectedRoute>} />
-            <Route path="/pengaduan" element={<ProtectedRoute><Pengaduan /></ProtectedRoute>} />
-            <Route path="/konsultasi" element={<ProtectedRoute><KonsultasiHukum /></ProtectedRoute>} />
-            <Route path="/konsultasi/ai" element={<ProtectedRoute><AIConsultation /></ProtectedRoute>} />
-            <Route path="/konsultasi/chat" element={<ProtectedRoute><LiveChat /></ProtectedRoute>} />
-            <Route path="/admin/*" element={<AdminRoute><AdminApp /></AdminRoute>} />
+            
+            <Route path="/dashboard" element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/profile" element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            } />
+            <Route path="/forum" element={
+              <ProtectedRoute>
+                <ForumDiskusi />
+              </ProtectedRoute>
+            } />
+            <Route path="/pengaduan" element={
+              <ProtectedRoute>
+                <Pengaduan />
+              </ProtectedRoute>
+            } />
+            <Route path="/konsultasi" element={
+              <ProtectedRoute>
+                <KonsultasiHukum />
+              </ProtectedRoute>
+            } />
+            <Route path="/konsultasi/ai" element={
+              <ProtectedRoute>
+                <AIConsultation />
+              </ProtectedRoute>
+            } />
+            <Route path="/konsultasi/chat" element={
+              <ProtectedRoute>
+                <LiveChat />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/*" element={
+              <AdminRoute>
+                <AdminApp />
+              </AdminRoute>
+            } />
             <Route path="*" element={<NotFound />} />
           </Routes>
-        </AuthProvider>
-      </BrowserRouter>
-    </div>
+        </div>
+      </AuthProvider>
+    </BrowserRouter>
   );
 }
 

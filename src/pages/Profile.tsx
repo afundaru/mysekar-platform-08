@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { Suspense } from 'react';
 import UserProfile from '@/components/user/UserProfile';
 import DashboardBottomNavigation from '@/components/DashboardBottomNavigation';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -21,6 +21,13 @@ const ErrorFallback = ({ error, resetErrorBoundary }) => {
   );
 };
 
+// Loading fallback
+const LoadingFallback = () => (
+  <div className="p-4 flex justify-center">
+    <div className="w-8 h-8 border-4 border-teal border-t-transparent rounded-full animate-spin"></div>
+  </div>
+);
+
 const Profile: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
@@ -28,12 +35,16 @@ const Profile: React.FC = () => {
       <div className="bg-teal h-6"></div>
       
       {/* Header */}
-      <DashboardHeader />
+      <ErrorBoundary FallbackComponent={ErrorFallback}>
+        <DashboardHeader />
+      </ErrorBoundary>
       
       {/* Main Content */}
       <main className="p-4 pb-20">
         <ErrorBoundary FallbackComponent={ErrorFallback}>
-          <UserProfile />
+          <Suspense fallback={<LoadingFallback />}>
+            <UserProfile />
+          </Suspense>
         </ErrorBoundary>
       </main>
       

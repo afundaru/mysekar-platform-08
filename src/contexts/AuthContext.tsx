@@ -18,18 +18,9 @@ interface AuthContextType {
 }
 
 // Create the context with a default value
-const AuthContext = createContext<AuthContextType>({
-  session: null,
-  user: null,
-  loading: true,
-  userRole: null,
-  isAdmin: false,
-  signOut: async () => {},
-  isValidEmail: () => false,
-  checkIsAdmin: async () => false
-});
+const AuthContext = createContext<AuthContextType | null>(null);
 
-// Export the AuthProvider as a proper React functional component
+// Export the AuthProvider component
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -38,7 +29,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isAdmin, setIsAdmin] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
-  // Improved memoized function to check admin status
+  // Function to check admin status
   const checkIsAdmin = useCallback(async (): Promise<boolean> => {
     if (!user) return false;
     
@@ -179,10 +170,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-// Create the useAuth hook
+// Create the useAuth hook with null-check
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) {
+  if (context === null) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
