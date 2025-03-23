@@ -8,20 +8,23 @@ import { toast } from 'sonner';
 import ProfileHeader from './ProfileHeader';
 import PersonalInfo from './PersonalInfo';
 import MembershipInfo from './MembershipInfo';
+import { useNavigate } from 'react-router-dom';
 
 const UserProfile: React.FC = () => {
   const { user } = useAuth();
   const [editing, setEditing] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
   
   // Function to handle going back to dashboard
   const handleGoBack = () => {
     console.log("Navigating back to dashboard");
     try {
-      window.location.href = '/dashboard';
+      navigate('/dashboard');
     } catch (error) {
       console.error("Navigation error:", error);
+      // Fallback if navigate fails
       window.location.href = '/dashboard';
     }
   };
