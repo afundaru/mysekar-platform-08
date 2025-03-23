@@ -4,7 +4,7 @@ import { ErrorBoundary } from 'react-error-boundary';
 import DashboardHeader from '@/components/DashboardHeader';
 import MembershipCard from '@/components/MembershipCard';
 import { Skeleton } from "@/components/ui/skeleton";
-import DashboardBottomNavigation from '@/components/DashboardBottomNavigation';
+import BottomNavigation from '@/components/BottomNavigation';
 
 // Lazy load UserProfile component
 const UserProfile = lazy(() => import('@/components/user/UserProfile'));
@@ -69,7 +69,7 @@ const Profile = () => {
       
       {/* Bottom Navigation */}
       <ErrorBoundary FallbackComponent={ErrorFallback}>
-        <DashboardBottomNavigation />
+        <BottomNavigation />
       </ErrorBoundary>
     </div>
   );
