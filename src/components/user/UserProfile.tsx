@@ -236,11 +236,11 @@ const UserProfile: React.FC = () => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="center">
-                  <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
+                  <DropdownMenuItem onClick={handleGalleryClick}>
                     <ImageIcon className="mr-2 h-4 w-4" />
                     <span>Pilih dari Galeri</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => cameraInputRef.current?.click()}>
+                  <DropdownMenuItem onClick={handleCameraClick}>
                     <Camera className="mr-2 h-4 w-4" />
                     <span>Ambil Foto</span>
                   </DropdownMenuItem>
@@ -250,120 +250,14 @@ const UserProfile: React.FC = () => {
               <input 
                 type="file" 
                 ref={fileInputRef} 
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (!file || !user) return;
-                  
-                  setUploading(true);
-                  setError(null);
-                  
-                  try {
-                    // Generate a unique file name
-                    const fileExt = file.name.split('.').pop();
-                    const fileName = `${user.id}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-                    const filePath = `${fileName}`;
-                    
-                    // Check file size (max 5MB)
-                    if (file.size > 5 * 1024 * 1024) {
-                      throw new Error('File too large. Maximum size is 5MB.');
-                    }
-                    
-                    // Upload the file to Supabase Storage
-                    supabase.storage
-                      .from('avatars')
-                      .upload(filePath, file)
-                      .then(({ error: uploadError, data }) => {
-                        if (uploadError) throw uploadError;
-                        
-                        // Get the public URL
-                        const { data: publicUrlData } = supabase.storage.from('avatars').getPublicUrl(filePath);
-                        
-                        // Update user metadata with avatar URL
-                        return supabase.auth.updateUser({
-                          data: { avatar_url: publicUrlData.publicUrl }
-                        });
-                      })
-                      .then(({ error: updateError, data }) => {
-                        if (updateError) throw updateError;
-                        
-                        setAvatarUrl(data?.user?.user_metadata?.avatar_url || null);
-                        toast.success("Foto profil berhasil diperbarui");
-                      })
-                      .catch((error) => {
-                        console.error('Error uploading avatar:', error);
-                        setError(error.message || "Gagal mengunggah foto profil");
-                        toast.error(error.message || "Gagal mengunggah foto profil");
-                      })
-                      .finally(() => {
-                        setUploading(false);
-                      });
-                  } catch (error: any) {
-                    console.error('Error processing avatar:', error);
-                    setError(error.message || "Gagal memproses foto profil");
-                    toast.error(error.message || "Gagal memproses foto profil");
-                    setUploading(false);
-                  }
-                }}
+                onChange={handleFileChange}
                 accept="image/*" 
                 className="hidden" 
               />
               <input 
                 type="file" 
                 ref={cameraInputRef} 
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (!file || !user) return;
-                  
-                  setUploading(true);
-                  setError(null);
-                  
-                  try {
-                    // Generate a unique file name
-                    const fileExt = file.name.split('.').pop();
-                    const fileName = `${user.id}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-                    const filePath = `${fileName}`;
-                    
-                    // Check file size (max 5MB)
-                    if (file.size > 5 * 1024 * 1024) {
-                      throw new Error('File too large. Maximum size is 5MB.');
-                    }
-                    
-                    // Upload the file to Supabase Storage
-                    supabase.storage
-                      .from('avatars')
-                      .upload(filePath, file)
-                      .then(({ error: uploadError, data }) => {
-                        if (uploadError) throw uploadError;
-                        
-                        // Get the public URL
-                        const { data: publicUrlData } = supabase.storage.from('avatars').getPublicUrl(filePath);
-                        
-                        // Update user metadata with avatar URL
-                        return supabase.auth.updateUser({
-                          data: { avatar_url: publicUrlData.publicUrl }
-                        });
-                      })
-                      .then(({ error: updateError, data }) => {
-                        if (updateError) throw updateError;
-                        
-                        setAvatarUrl(data?.user?.user_metadata?.avatar_url || null);
-                        toast.success("Foto profil berhasil diperbarui");
-                      })
-                      .catch((error) => {
-                        console.error('Error uploading avatar:', error);
-                        setError(error.message || "Gagal mengunggah foto profil");
-                        toast.error(error.message || "Gagal mengunggah foto profil");
-                      })
-                      .finally(() => {
-                        setUploading(false);
-                      });
-                  } catch (error: any) {
-                    console.error('Error processing avatar:', error);
-                    setError(error.message || "Gagal memproses foto profil");
-                    toast.error(error.message || "Gagal memproses foto profil");
-                    setUploading(false);
-                  }
-                }}
+                onChange={handleFileChange}
                 accept="image/*" 
                 capture="user" 
                 className="hidden" 
@@ -448,29 +342,5 @@ const UserProfile: React.FC = () => {
     </div>
   );
 };
-
-// Load avatar URL from user metadata on component mount
-useEffect(() => {
-  if (user?.user_metadata?.avatar_url) {
-    setAvatarUrl(user.user_metadata.avatar_url);
-  }
-}, [user]);
-
-// Handle offline state
-useEffect(() => {
-  const handleOnlineStatus = () => {
-    if (!navigator.onLine) {
-      toast.warning("Anda sedang offline. Beberapa fitur mungkin tidak tersedia.");
-    }
-  };
-  
-  window.addEventListener('online', handleOnlineStatus);
-  window.addEventListener('offline', handleOnlineStatus);
-  
-  return () => {
-    window.removeEventListener('online', handleOnlineStatus);
-    window.removeEventListener('offline', handleOnlineStatus);
-  };
-}, []);
 
 export default UserProfile;
