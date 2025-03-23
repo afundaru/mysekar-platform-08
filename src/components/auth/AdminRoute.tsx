@@ -28,6 +28,19 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
       const cacheKey = `admin_status_${user.id}`;
       const cachedStatus = sessionStorage.getItem(cacheKey);
       
+      // Always grant admin access in development mode to facilitate testing
+      if (import.meta.env.DEV) {
+        console.log('Development mode - granting admin access for development purposes');
+        setHasAccess(true);
+        setChecking(false);
+        sessionStorage.setItem(cacheKey, JSON.stringify({
+          status: true,
+          timestamp: Date.now(),
+          temporary: true
+        }));
+        return;
+      }
+      
       if (cachedStatus) {
         const { status, timestamp } = JSON.parse(cachedStatus);
         const isRecent = Date.now() - timestamp < 5 * 60 * 1000;
@@ -40,51 +53,37 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
         }
       }
       
-      // Offline fallback for development or network issues
-      // This enables working on the application even when Supabase is unavailable
-      if (import.meta.env.DEV || !navigator.onLine) {
-        console.log('Development mode or offline - granting admin access for development purposes');
-        setHasAccess(true);
-        setChecking(false);
-        setNetworkError(true);
-        
-        // Store this temporary access in session
-        sessionStorage.setItem(cacheKey, JSON.stringify({
-          status: true,
-          timestamp: Date.now(),
-          temporary: true
-        }));
-        
-        return;
-      }
-      
-      // Use a try/catch for the database request
-      const { data, error } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', user.id)
-        .eq('role', 'admin')
-        .maybeSingle();
-      
-      if (error) {
-        console.error('Error checking admin status:', error);
-        
-        // If it's a network error and we have cached status, use it
-        if ((error.message?.includes('Failed to fetch') || error.message?.includes('network')) && cachedStatus) {
+      // If offline, grant temporary access based on cached status or dev mode
+      if (!navigator.onLine) {
+        if (cachedStatus) {
           const { status } = JSON.parse(cachedStatus);
           setHasAccess(status);
           setNetworkError(true);
-          toast.error('Koneksi jaringan bermasalah, menggunakan status terakhir');
+          setChecking(false);
+          toast.warning('Mode offline: Menggunakan status admin terakhir yang diketahui');
+          return;
         } else if (import.meta.env.DEV) {
-          // In development, allow access even when Supabase fails
           setHasAccess(true);
           setNetworkError(true);
-          toast.warning('Mode pengembangan: Akses admin diberikan secara default');
-        } else {
-          toast.error('Gagal memeriksa status admin: ' + error.message);
-          setHasAccess(false);
+          setChecking(false);
+          toast.warning('Mode pengembangan offline: Akses admin diberikan secara default');
+          return;
         }
-      } else {
+      }
+      
+      try {
+        // Use a try/catch for the database request
+        const { data, error } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', user.id)
+          .eq('role', 'admin')
+          .maybeSingle();
+        
+        if (error) {
+          throw error;
+        }
+        
         const isAdmin = !!data;
         setHasAccess(isAdmin);
         setNetworkError(false);
@@ -95,6 +94,24 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
         }));
         
         console.log('Admin status check result:', isAdmin, data);
+      } catch (error) {
+        console.error('Error checking admin status:', error);
+        
+        // If we have cached status, use it when there's an error
+        if (cachedStatus) {
+          const { status } = JSON.parse(cachedStatus);
+          setHasAccess(status);
+          setNetworkError(true);
+          toast.error('Koneksi ke database bermasalah, menggunakan status terakhir');
+        } else if (import.meta.env.DEV) {
+          // In development, allow access even when Supabase fails
+          setHasAccess(true);
+          setNetworkError(true);
+          toast.warning('Mode pengembangan: Akses admin diberikan secara default');
+        } else {
+          toast.error('Gagal memeriksa status admin');
+          setHasAccess(false);
+        }
       }
     } catch (err) {
       console.error('Exception checking admin status:', err);

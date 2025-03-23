@@ -5,33 +5,8 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import AdminSidebar from "./components/AdminSidebar";
 import { Keanggotaan, Forum, Pengaduan, Konsultasi } from "./components/AdminModules";
 import { toast } from "sonner";
-
-// Lazy load components with error handling
-const DashboardAdmin = lazy(() => 
-  import("./components/DashboardAdmin").catch(err => {
-    console.error("Error loading DashboardAdmin:", err);
-    toast.error("Gagal memuat Dashboard Admin");
-    return { default: () => (
-      <div className="p-4 text-center">
-        <h1 className="text-xl text-red-500">Error memuat Dashboard</h1>
-        <p>Silakan refresh halaman atau hubungi admin</p>
-      </div>
-    )};
-  })
-);
-
-const AddAdmin = lazy(() => 
-  import("./AddAdmin").catch(err => {
-    console.error("Error loading AddAdmin:", err);
-    toast.error("Gagal memuat halaman Tambah Admin");
-    return { default: () => (
-      <div className="p-4 text-center">
-        <h1 className="text-xl text-red-500">Error memuat halaman Tambah Admin</h1>
-        <p>Silakan refresh halaman atau hubungi admin</p>
-      </div>
-    )};
-  })
-);
+import AddAdmin from "./AddAdmin"; // Import directly instead of lazy loading
+import DashboardAdmin from "./components/DashboardAdmin"; // Import directly instead of lazy loading
 
 // Loading fallback component
 const LoadingFallback = () => (

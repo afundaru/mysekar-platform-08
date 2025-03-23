@@ -11,10 +11,27 @@ const isLocalhost = Boolean(
 type Config = {
   onSuccess?: (registration: ServiceWorkerRegistration) => void;
   onUpdate?: (registration: ServiceWorkerRegistration) => void;
+  onOffline?: () => void;
+  onOnline?: () => void;
 };
 
 export function register(config?: Config) {
-  if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {
+  if ('serviceWorker' in navigator) {
+    // Register network status event handlers
+    window.addEventListener('online', () => {
+      console.log('Application is online');
+      if (config && config.onOnline) {
+        config.onOnline();
+      }
+    });
+    
+    window.addEventListener('offline', () => {
+      console.log('Application is offline');
+      if (config && config.onOffline) {
+        config.onOffline();
+      }
+    });
+    
     window.addEventListener('load', () => {
       const swUrl = `/service-worker.js`;
 
@@ -33,6 +50,8 @@ function registerValidSW(swUrl: string, config?: Config) {
   navigator.serviceWorker
     .register(swUrl)
     .then((registration) => {
+      console.log('Service worker registered successfully');
+      
       registration.onupdatefound = () => {
         const installingWorker = registration.installing;
         if (installingWorker == null) {
@@ -85,6 +104,9 @@ function checkValidServiceWorker(swUrl: string, config?: Config) {
     })
     .catch(() => {
       console.log('No internet connection found. App is running in offline mode.');
+      if (config && config.onOffline) {
+        config.onOffline();
+      }
     });
 }
 
@@ -97,5 +119,12 @@ export function unregister() {
       .catch((error) => {
         console.error(error.message);
       });
+  }
+}
+
+// Function to notify the service worker to skip waiting and activate immediately
+export function skipWaiting() {
+  if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+    navigator.serviceWorker.controller.postMessage({ type: 'SKIP_WAITING' });
   }
 }

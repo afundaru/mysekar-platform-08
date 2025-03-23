@@ -1,4 +1,3 @@
-
 import React, { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -7,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
+import Admin from "./pages/admin";
 
 // Loading fallback component
 const LoadingFallback = () => (
@@ -30,7 +30,6 @@ const Login = lazy(() =>
   })
 );
 
-// ... load other pages with the same pattern
 const Register = lazy(() => import("./pages/Register"));
 const OtpVerification = lazy(() => import("./pages/OtpVerification"));
 const RegistrationSuccess = lazy(() => import("./pages/RegistrationSuccess"));
@@ -42,7 +41,6 @@ const Pengaduan = lazy(() => import("./pages/Pengaduan"));
 const Profile = lazy(() => import("./pages/Profile"));
 const ForumDiskusi = lazy(() => import("./pages/ForumDiskusi"));
 const NotFound = lazy(() => import("./pages/NotFound"));
-const Admin = lazy(() => import("./pages/admin"));
 
 // Initialize React Query with performance optimizations
 const queryClient = new QueryClient({
@@ -71,7 +69,6 @@ const App = () => (
               <Route path="/otp-verification" element={<OtpVerification />} />
               <Route path="/registration-success" element={<RegistrationSuccess />} />
               
-              {/* Protected Routes */}
               <Route path="/dashboard" element={
                 <ProtectedRoute>
                   <Dashboard />
@@ -108,10 +105,8 @@ const App = () => (
                 </ProtectedRoute>
               } />
               
-              {/* Admin Routes */}
               <Route path="/admin/*" element={<Admin />} />
               
-              {/* Catch-all route */}
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
