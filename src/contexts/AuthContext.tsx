@@ -33,8 +33,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!user) return false;
     
     try {
+      // Aumentar el timeout a 20 segundos para evitar errores frecuentes de timeout
       const timeoutPromise = new Promise<{data: null, error: Error}>((_, reject) => {
-        setTimeout(() => reject(new Error('Request timeout')), 10000);
+        setTimeout(() => reject(new Error('Request timeout')), 20000);
       });
       
       const fetchPromise = supabase
@@ -48,6 +49,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (error) {
         console.error('Error checking admin status:', error);
+        // Si es un error de timeout, no cambiar el estado actual
+        if (error.message === 'Request timeout') {
+          console.warn('Admin check timed out, using cached state');
+          return isAdmin; // Mantener el estado actual
+        }
         return false;
       }
       
@@ -57,6 +63,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return isUserAdmin;
     } catch (error) {
       console.error('Error checking admin status:', error);
+      // Si hay un error, asumir que el usuario no es admin
+      // pero mantener el estado actual si ya estaba establecido
       return isAdmin; // Return current state if there's an error
     }
   }, [user, isAdmin]);
@@ -77,6 +85,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 await checkIsAdmin();
               } catch (e) {
                 console.error('Failed to check admin status after auth change:', e);
+                // Si falla la verificación, asumir rol de usuario regular
                 setUserRole('user');
               }
             } else {
@@ -98,6 +107,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             await checkIsAdmin();
           } catch (e) {
             console.error('Failed to check admin status on initial load:', e);
+            // En caso de error durante la carga inicial, establecer como usuario regular
             setUserRole('user');
           }
         }
