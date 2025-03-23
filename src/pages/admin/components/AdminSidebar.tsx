@@ -10,7 +10,7 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
-import { LayoutDashboard, Users, MessageSquare, Flag, Gavel, LogOut, ShieldCheck } from "lucide-react";
+import { LayoutDashboard, Users, MessageSquare, Flag, Gavel, LogOut, ShieldCheck, Megaphone } from "lucide-react";
 import SignOutButton from "@/components/auth/SignOutButton";
 
 const AdminSidebar = () => {
@@ -47,6 +47,14 @@ const AdminSidebar = () => {
               <Link to="/admin/forum">
                 <MessageSquare />
                 <span>Forum & Komunikasi</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild tooltip="Pengumuman" className={location.pathname === "/admin/announcements" ? "bg-teal/10" : ""}>
+              <Link to="/admin/announcements">
+                <Megaphone />
+                <span>Pengumuman & Berita</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

@@ -7,6 +7,7 @@ import { Keanggotaan, Forum, Pengaduan, Konsultasi } from "./components/AdminMod
 import { toast } from "sonner";
 import AddAdmin from "./AddAdmin"; // Import directly instead of lazy loading
 import DashboardAdmin from "./components/DashboardAdmin"; // Import directly instead of lazy loading
+import AnnouncementManager from "./components/AnnouncementManager"; // Add this import
 
 // Loading fallback component
 const LoadingFallback = () => (
@@ -61,6 +62,7 @@ const AdminApp = () => {
                   <Route path="pengaduan" element={<Pengaduan />} />
                   <Route path="konsultasi" element={<Konsultasi />} />
                   <Route path="add-admin" element={<AddAdmin />} />
+                  <Route path="announcements" element={<AnnouncementManager />} /> {/* Add this route */}
                   <Route path="*" element={<Navigate to="/admin" replace />} />
                 </Routes>
               </Suspense>
