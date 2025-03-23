@@ -7,7 +7,7 @@ import QuickAccess from '@/components/QuickAccess';
 import Statistics from '@/components/Statistics';
 import BottomNavigation from '@/components/BottomNavigation';
 
-const Index: React.FC = () => {
+const Index = () => {
   // Add subtle animation on initial load
   useEffect(() => {
     document.body.classList.add('overflow-x-hidden');
