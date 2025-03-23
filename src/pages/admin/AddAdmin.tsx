@@ -40,31 +40,31 @@ const AddAdmin: React.FC = () => {
 
   // Check admin status on load
   useEffect(() => {
-    const checkAdminStatus = async () => {
-      if (!user) return;
-      
-      try {
-        console.log("Memeriksa status admin untuk user:", user.id);
-        setError(null);
-        const isUserAdmin = await checkIsAdmin();
-        setIsAdmin(isUserAdmin);
-        console.log("Status admin:", isUserAdmin);
-      } catch (err: any) {
-        console.error('Error checking admin status:', err);
-        setError(`Gagal memeriksa status admin: ${err.message || 'Unknown error'}`);
-        
-        // Set default status in development mode
-        if (import.meta.env.DEV) {
-          setIsAdmin(true);
-          console.log('Development mode - assuming admin access for development purposes');
-        }
-      } finally {
-        setCheckingStatus(false);
-      }
-    };
-    
     checkAdminStatus();
-  }, [user, checkIsAdmin]);
+  }, [user]);
+
+  const checkAdminStatus = async () => {
+    if (!user) return;
+    
+    try {
+      console.log("Memeriksa status admin untuk user:", user.id);
+      setError(null);
+      const isUserAdmin = await checkIsAdmin();
+      setIsAdmin(isUserAdmin);
+      console.log("Status admin:", isUserAdmin);
+      setCheckingStatus(false);
+    } catch (err: any) {
+      console.error('Error checking admin status:', err);
+      setError(`Gagal memeriksa status admin: ${err.message || 'Unknown error'}`);
+      
+      // Set default status in development mode
+      if (import.meta.env.DEV) {
+        setIsAdmin(true);
+        console.log('Development mode - assuming admin access for development purposes');
+      }
+      setCheckingStatus(false);
+    }
+  };
 
   const makeAdmin = async () => {
     if (!user) {
@@ -85,32 +85,25 @@ const AddAdmin: React.FC = () => {
     try {
       console.log("Menambahkan user sebagai admin:", user.id);
       
-      // Coba langsung menambahkan user sebagai admin
-      const { error: insertError } = await supabase
-        .from('user_roles')
-        .insert({ 
-          user_id: user.id,
-          role: 'admin'
-        });
+      // Call the Edge Function instead of direct DB access
+      const { data, error } = await supabase.functions.invoke('add-admin', {
+        body: { userId: user.id }
+      });
       
-      if (insertError) {
-        // Handle error khusus constraint violation (sudah admin)
-        if (insertError.code === '23505') { // Unique violation code
-          setSuccess('Anda sudah menjadi admin');
-          toast.info('Anda sudah menjadi admin');
-          setIsAdmin(true);
-        } else if (insertError.message && insertError.message.includes('fetch')) {
-          // Network error
-          throw new Error('Gagal terhubung ke server. Periksa koneksi internet Anda.');
-        } else {
-          throw new Error(`Gagal menambahkan admin: ${insertError.message}`);
-        }
-      } else {
-        setSuccess('Anda berhasil menjadi admin!');
-        toast.success('Anda berhasil menjadi admin!');
+      console.log("Response from add-admin function:", data, error);
+      
+      if (error) {
+        throw new Error(`Gagal menambahkan admin: ${error.message}`);
+      }
+      
+      if (data?.message) {
+        setSuccess(data.message);
+        toast.success(data.message);
         setIsAdmin(true);
         // Update auth context
         await checkIsAdmin();
+      } else if (data?.error) {
+        throw new Error(data.error);
       }
     } catch (err: any) {
       console.error('Error making admin:', err);
@@ -124,29 +117,6 @@ const AddAdmin: React.FC = () => {
       }
     } finally {
       setLoading(false);
-    }
-  };
-
-  const checkAdminStatus = async () => {
-    if (!user) return;
-    
-    setError(null);
-    try {
-      const isUserAdmin = await checkIsAdmin();
-      setIsAdmin(isUserAdmin);
-    } catch (err: any) {
-      console.error('Error rechecking admin status:', err);
-      
-      if (!navigator.onLine) {
-        setError('Tidak dapat memeriksa status admin karena Anda sedang offline');
-      } else {
-        setError(`Gagal memeriksa status admin: ${err.message || 'Unknown error'}`);
-      }
-      
-      // Set default in development mode
-      if (import.meta.env.DEV) {
-        setIsAdmin(true);
-      }
     }
   };
 

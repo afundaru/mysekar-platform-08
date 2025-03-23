@@ -29,8 +29,10 @@ serve(async (req) => {
     }
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL") as string;
-    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY") as string;
-    const supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") as string;
+    
+    // Important: We're using the service role key to bypass RLS
+    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
       global: {
         headers: {
           Authorization: authHeader,
@@ -38,15 +40,15 @@ serve(async (req) => {
       },
     });
 
-    // Dapatkan user id dari token
+    // Get user from token
     const {
       data: { user },
       error: userError,
-    } = await supabaseClient.auth.getUser();
+    } = await supabaseAdmin.auth.getUser();
 
     if (userError || !user) {
       return new Response(
-        JSON.stringify({ error: 'Error mendapatkan data user' }),
+        JSON.stringify({ error: 'Error getting user data' }),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 401 
@@ -54,35 +56,15 @@ serve(async (req) => {
       );
     }
 
-    const requestData = await req.json();
-    const { email } = requestData;
-
-    // Cari user dengan email yang diberikan
-    const { data: userData, error: getUserError } = await supabaseClient
-      .from('profiles')
-      .select('id')
-      .eq('id', user.id)
-      .single();
-
-    if (getUserError || !userData) {
-      return new Response(
-        JSON.stringify({ error: 'User tidak ditemukan' }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 404 
-        }
-      );
-    }
-
-    // Periksa apakah sudah ada admin di sistem
-    const { data: existingAdmins, error: adminsError } = await supabaseClient
+    // Check if there are any existing admins
+    const { data: existingAdmins, error: adminsError } = await supabaseAdmin
       .from('user_roles')
       .select('id')
       .eq('role', 'admin');
 
     if (adminsError) {
       return new Response(
-        JSON.stringify({ error: 'Error checking existing admins' }),
+        JSON.stringify({ error: 'Error checking existing admins', details: adminsError }),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 500 
@@ -90,10 +72,10 @@ serve(async (req) => {
       );
     }
 
-    // Jika ini bukan admin pertama, hanya admin yang bisa menambahkan admin baru
+    // If this isn't the first admin, only existing admins can add new admins
     if (existingAdmins && existingAdmins.length > 0) {
-      // Verifikasi apakah user saat ini adalah admin
-      const { data: isAdmin, error: adminCheckError } = await supabaseClient
+      // Verify if current user is admin
+      const { data: isAdmin, error: adminCheckError } = await supabaseAdmin
         .from('user_roles')
         .select('id')
         .eq('user_id', user.id)
@@ -102,7 +84,7 @@ serve(async (req) => {
 
       if (adminCheckError || !isAdmin) {
         return new Response(
-          JSON.stringify({ error: 'Hanya admin yang dapat menambahkan admin baru' }),
+          JSON.stringify({ error: 'Only admins can add new admins' }),
           { 
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
             status: 403 
@@ -111,8 +93,8 @@ serve(async (req) => {
       }
     }
 
-    // Tambahkan user sebagai admin
-    const { data: insertData, error: insertError } = await supabaseClient
+    // Add the user as admin - using service_role to bypass RLS
+    const { data: insertData, error: insertError } = await supabaseAdmin
       .from('user_roles')
       .insert([
         { user_id: user.id, role: 'admin' }
@@ -122,7 +104,7 @@ serve(async (req) => {
     if (insertError) {
       if (insertError.code === '23505') { // Unique violation code
         return new Response(
-          JSON.stringify({ message: 'User sudah memiliki role admin' }),
+          JSON.stringify({ message: 'User already has admin role' }),
           { 
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
             status: 200 
@@ -131,7 +113,7 @@ serve(async (req) => {
       }
       
       return new Response(
-        JSON.stringify({ error: 'Gagal menambahkan admin', details: insertError }),
+        JSON.stringify({ error: 'Failed to add admin', details: insertError }),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 500 
@@ -141,7 +123,7 @@ serve(async (req) => {
 
     return new Response(
       JSON.stringify({ 
-        message: 'Berhasil menambahkan admin',
+        message: 'Successfully added admin',
         data: insertData
       }),
       { 
