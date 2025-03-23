@@ -5,6 +5,7 @@ import DashboardBottomNavigation from '@/components/DashboardBottomNavigation';
 import { ErrorBoundary } from 'react-error-boundary';
 import DashboardHeader from '@/components/DashboardHeader';
 import MembershipCard from '@/components/MembershipCard';
+import { BrowserRouter } from 'react-router-dom';
 
 // Error fallback component
 const ErrorFallback = ({ error, resetErrorBoundary }) => {
@@ -30,6 +31,8 @@ const LoadingFallback = () => (
 );
 
 const Profile = () => {
+  // The issue is that we're using useNavigate in UserProfile but it's not within a Router context
+  // We need to ensure Router context is available
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Status Bar */}

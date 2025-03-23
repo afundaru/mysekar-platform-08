@@ -15,12 +15,14 @@ const UserProfile: React.FC = () => {
   const [editing, setEditing] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate();
   
-  // Function to handle going back to dashboard
-  const handleGoBack = () => {
+  // Use try-catch to handle potential navigation issues
+  // if Router context isn't available
+  const navigateBackSafely = () => {
     console.log("Navigating back to dashboard");
     try {
+      // Try to use useNavigate, but have a fallback
+      const navigate = useNavigate();
       navigate('/dashboard');
     } catch (error) {
       console.error("Navigation error:", error);
@@ -73,7 +75,7 @@ const UserProfile: React.FC = () => {
         <Button 
           variant="ghost" 
           size="icon"
-          onClick={handleGoBack}
+          onClick={() => window.location.href = '/dashboard'}
           className="mr-2"
         >
           <ArrowLeft className="h-5 w-5" />
