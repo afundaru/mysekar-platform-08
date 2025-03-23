@@ -8,8 +8,9 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import Admin from "./pages/admin";
-import KonsultasiHukum from "./pages/KonsultasiHukum"; // Direct import instead of lazy loading
-import Pengaduan from "./pages/Pengaduan"; // Direct import instead of lazy loading
+import KonsultasiHukum from "./pages/KonsultasiHukum"; // Direct import
+import Pengaduan from "./pages/Pengaduan"; // Direct import
+import ForumDiskusi from "./pages/ForumDiskusi"; // Direct import instead of lazy loading
 
 // Loading fallback component
 const LoadingFallback = () => (
@@ -39,10 +40,10 @@ const RegistrationSuccess = lazy(() => import("./pages/RegistrationSuccess"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 // KonsultasiHukum is now directly imported above
 // Pengaduan is now directly imported above
+// ForumDiskusi is now directly imported above
 const AIConsultation = lazy(() => import("./pages/AIConsultation"));
 const LiveChat = lazy(() => import("./pages/LiveChat"));
 const Profile = lazy(() => import("./pages/Profile"));
-const ForumDiskusi = lazy(() => import("./pages/ForumDiskusi"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Initialize React Query with performance optimizations
