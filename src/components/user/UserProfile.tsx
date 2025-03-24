@@ -25,7 +25,7 @@ const UserProfile: React.FC = () => {
     userEmail: user?.email || 'none'
   });
   
-  // Function to handle going back to dashboard
+  // Function to handle going back to dashboard - using direct navigation instead of useNavigate
   const handleGoBack = () => {
     console.log("Navigating back to dashboard");
     window.location.href = '/dashboard';

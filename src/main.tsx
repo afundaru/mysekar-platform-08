@@ -19,7 +19,7 @@ if (!rootElement) {
 // Create root outside of render to help with debugging
 const root = ReactDOM.createRoot(rootElement);
 
-// Adjust the order of providers - React must be properly initialized first
+// Ensure proper nesting order of providers - React must be properly initialized first
 root.render(
   <React.StrictMode>
     <Router>
