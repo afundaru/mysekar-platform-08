@@ -1,10 +1,11 @@
 
-import React, { Suspense, lazy } from 'react';
+import React, { Suspense, lazy, useEffect } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import DashboardHeader from '@/components/DashboardHeader';
 import MembershipCard from '@/components/MembershipCard';
 import { Skeleton } from "@/components/ui/skeleton";
 import BottomNavigation from '@/components/BottomNavigation';
+import { useAuth } from '@/contexts/AuthContext';
 
 // Lazy load UserProfile component
 const UserProfile = lazy(() => import('@/components/user/UserProfile'));
@@ -36,6 +37,16 @@ const LoadingFallback = () => (
 );
 
 const Profile = () => {
+  const auth = useAuth();
+  
+  useEffect(() => {
+    console.log("Profile page mounted, auth state:", {
+      hasUser: !!auth.user,
+      isLoading: auth.loading,
+      userEmail: auth.user?.email || 'none'
+    });
+  }, [auth.user, auth.loading]);
+  
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Status Bar */}

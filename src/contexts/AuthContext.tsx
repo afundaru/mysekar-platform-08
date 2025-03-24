@@ -1,4 +1,3 @@
-
 import * as React from 'react';
 import { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import { Session, User } from '@supabase/supabase-js';
@@ -253,5 +252,13 @@ export const useAuth = () => {
     console.error("useAuth must be used within an AuthProvider");
     throw new Error('useAuth must be used within an AuthProvider');
   }
+  
+  console.log("useAuth hook called:", { 
+    hasUser: !!context.user, 
+    userEmail: context.user?.email || 'none',
+    loading: context.loading,
+    role: context.userRole
+  });
+  
   return context;
 };
