@@ -2,12 +2,10 @@
 import React from 'react';
 import { Bell, Settings } from 'lucide-react';
 import { 
-  DropdownMenu,
-  DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
-  DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
+import { DropdownWrapper } from '@/components/ui/dropdown-wrapper';
 import SignOutButton from './auth/SignOutButton';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -46,22 +44,22 @@ const DashboardHeader: React.FC = () => {
           <Bell className="h-5 w-5" />
           <span className="absolute -top-1 -right-1 bg-red-500 w-2 h-2 rounded-full"></span>
         </button>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
+        <DropdownWrapper 
+          trigger={
             <button className="focus:outline-none">
               <Settings className="h-5 w-5 text-gray-600" />
             </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => window.location.href = '/profile'}>
-              Pengaturan Profil
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <SignOutButton variant="ghost" showIcon={true} className="w-full justify-start p-0 h-auto font-normal" />
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+          }
+          align="end"
+        >
+          <DropdownMenuItem onClick={() => window.location.href = '/profile'}>
+            Pengaturan Profil
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem>
+            <SignOutButton variant="ghost" showIcon={true} className="w-full justify-start p-0 h-auto font-normal" />
+          </DropdownMenuItem>
+        </DropdownWrapper>
       </div>
     </header>
   );

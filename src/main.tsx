@@ -19,8 +19,6 @@ if (!rootElement) {
 const root = ReactDOM.createRoot(rootElement);
 
 // Root React element with proper provider hierarchy
-// React.StrictMode must wrap everything
-// Router must be outside AuthProvider
 root.render(
   <React.StrictMode>
     <Router>

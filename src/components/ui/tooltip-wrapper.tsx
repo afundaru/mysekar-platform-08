@@ -1,7 +1,7 @@
 
 import React from 'react';
 import {
-  Tooltip as TooltipPrimitive,
+  Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger
@@ -17,14 +17,14 @@ interface TooltipWrapperProps {
 export function TooltipWrapper({ content, children, side = 'top', align = 'center' }: TooltipWrapperProps) {
   return (
     <TooltipProvider>
-      <TooltipPrimitive>
+      <Tooltip>
         <TooltipTrigger asChild>
           {children}
         </TooltipTrigger>
         <TooltipContent side={side} align={align}>
           {content}
         </TooltipContent>
-      </TooltipPrimitive>
+      </Tooltip>
     </TooltipProvider>
   );
 }
