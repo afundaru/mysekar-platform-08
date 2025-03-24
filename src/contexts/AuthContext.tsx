@@ -17,7 +17,7 @@ interface AuthContextType {
   checkIsAdmin: () => Promise<boolean>;
 }
 
-// Create context with meaningful default values
+// Create context with default values
 const AuthContext = createContext<AuthContextType>({
   session: null,
   user: null,
@@ -33,6 +33,7 @@ const AuthContext = createContext<AuthContextType>({
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   console.log("AuthProvider rendering");
   
+  // Initialize useState hooks properly
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
