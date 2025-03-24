@@ -6,7 +6,6 @@ import './index.css'
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import { toast } from 'sonner';
 import { BrowserRouter as Router } from 'react-router-dom';
-import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from '@/contexts/AuthContext';
 
 // Make sure we're using the correct element for mounting
@@ -21,14 +20,12 @@ const root = ReactDOM.createRoot(rootElement);
 
 // Root React element with proper provider hierarchy
 // React.StrictMode must wrap everything
-// Router must be outside TooltipProvider
+// Router must be outside AuthProvider
 root.render(
   <React.StrictMode>
     <Router>
       <AuthProvider>
-        <TooltipProvider>
-          <App />
-        </TooltipProvider>
+        <App />
       </AuthProvider>
     </Router>
   </React.StrictMode>

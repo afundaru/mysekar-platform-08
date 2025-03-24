@@ -1,4 +1,3 @@
-
 import React, { useRef, useState } from 'react';
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -12,6 +11,12 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
+import { 
+  Tooltip, 
+  TooltipContent, 
+  TooltipProvider, 
+  TooltipTrigger 
+} from "@/components/ui/tooltip";
 
 interface ProfileAvatarProps {
   user: any;
@@ -20,13 +25,11 @@ interface ProfileAvatarProps {
 }
 
 const ProfileAvatar: React.FC<ProfileAvatarProps> = ({ user, avatarUrl, setAvatarUrl }) => {
-  // Initialize all hooks at the top level - they must be called on every render
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
   
-  // Function to handle file selection
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file || !user) return;
@@ -35,27 +38,22 @@ const ProfileAvatar: React.FC<ProfileAvatarProps> = ({ user, avatarUrl, setAvata
     setError(null);
     
     try {
-      // Generate a unique file name
       const fileExt = file.name.split('.').pop();
       const fileName = `${user.id}-${Math.random().toString(36).substring(2)}.${fileExt}`;
       const filePath = `${fileName}`;
       
-      // Check file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
         throw new Error('File too large. Maximum size is 5MB.');
       }
       
-      // Upload the file to Supabase Storage
       const { error: uploadError, data } = await supabase.storage
         .from('avatars')
         .upload(filePath, file);
         
       if (uploadError) throw uploadError;
       
-      // Get the public URL
       const { data: publicUrlData } = supabase.storage.from('avatars').getPublicUrl(filePath);
       
-      // Update user metadata with avatar URL
       const { error: updateError } = await supabase.auth.updateUser({
         data: { avatar_url: publicUrlData.publicUrl }
       });
@@ -73,20 +71,16 @@ const ProfileAvatar: React.FC<ProfileAvatarProps> = ({ user, avatarUrl, setAvata
     }
   };
   
-  // Function to trigger file input click
   const handleGalleryClick = () => {
     fileInputRef.current?.click();
   };
   
-  // Function to trigger camera input click
   const handleCameraClick = () => {
     cameraInputRef.current?.click();
   };
   
-  // Fallback avatar URL
   const fallbackAvatarUrl = "https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-1.jpg";
   
-  // If no user, render a skeleton
   if (!user) {
     return (
       <div className="relative mr-4">
@@ -95,7 +89,6 @@ const ProfileAvatar: React.FC<ProfileAvatarProps> = ({ user, avatarUrl, setAvata
     );
   }
   
-  // Safe access to user metadata
   const memberData = user?.user_metadata || {};
   const userInitial = memberData?.full_name?.charAt(0) || user?.email?.charAt(0) || 'U';
   
@@ -107,7 +100,6 @@ const ProfileAvatar: React.FC<ProfileAvatarProps> = ({ user, avatarUrl, setAvata
             src={avatarUrl} 
             alt="Profile" 
             onError={(e) => {
-              // Fallback if image fails to load
               e.currentTarget.src = fallbackAvatarUrl;
             }}
           />
