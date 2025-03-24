@@ -40,15 +40,31 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
+  // Optimized checkIsAdmin function to leverage the new database indexes
   const checkIsAdmin = useCallback(async (): Promise<boolean> => {
     if (!user) return false;
     
     try {
-      // Increase timeout from 2 seconds to 5 seconds for better reliability
+      // Cache key for storing admin status
+      const cacheKey = `admin_status_${user.id}`;
+      const cachedStatus = sessionStorage.getItem(cacheKey);
+
+      // Check if we have a recent cached status (within the last 5 minutes)
+      if (cachedStatus) {
+        const { status, timestamp } = JSON.parse(cachedStatus);
+        // Use cached status if it's less than 5 minutes old
+        if (Date.now() - timestamp < 5 * 60 * 1000) {
+          console.log('Using cached admin status:', status);
+          return status;
+        }
+      }
+      
+      // Use Promise.race with a timeout, but increase it to 5 seconds
       const timeoutPromise = new Promise<{data: null, error: Error}>((_, reject) => {
         setTimeout(() => reject(new Error('Request timeout')), 5000);
       });
       
+      // Use indexed query for better performance
       const fetchPromise = supabase
         .from('user_roles')
         .select('role')
@@ -68,6 +84,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
       
       const isUserAdmin = !!data;
+      
+      // Cache the result
+      sessionStorage.setItem(cacheKey, JSON.stringify({
+        status: isUserAdmin,
+        timestamp: Date.now()
+      }));
+      
       setIsAdmin(isUserAdmin);
       setUserRole(isUserAdmin ? 'admin' : 'user');
       return isUserAdmin;
