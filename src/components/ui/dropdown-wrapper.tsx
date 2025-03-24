@@ -19,13 +19,16 @@ export function DropdownWrapper({
   align = 'center',
   className 
 }: DropdownWrapperProps) {
-  // Ensure we're returning a valid React element structure
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         {trigger}
       </DropdownMenuTrigger>
-      <DropdownMenuContent align={align} className={className} forceMount>
+      <DropdownMenuContent 
+        align={align} 
+        className={className} 
+        forceMount
+      >
         {children}
       </DropdownMenuContent>
     </DropdownMenu>

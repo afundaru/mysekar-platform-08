@@ -52,7 +52,7 @@ const DashboardHeader: React.FC = () => {
       
       {/* Right side with notifications and settings */}
       <div className="flex items-center space-x-4">
-        <button className="text-gray-600 relative">
+        <button type="button" className="text-gray-600 relative">
           <Bell className="h-5 w-5" />
           <span className="absolute -top-1 -right-1 bg-red-500 w-2 h-2 rounded-full"></span>
         </button>
@@ -60,7 +60,7 @@ const DashboardHeader: React.FC = () => {
         {/* Settings dropdown */}
         <DropdownWrapper 
           trigger={
-            <button className="focus:outline-none">
+            <button type="button" className="focus:outline-none">
               <Settings className="h-5 w-5 text-gray-600" />
             </button>
           }

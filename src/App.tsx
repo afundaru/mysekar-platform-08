@@ -13,9 +13,6 @@ function App() {
     console.log("useState available:", typeof React.useState === 'function');
     console.log("useEffect available:", typeof React.useEffect === 'function');
     
-    // Log global React object
-    console.log("Global React object:", window.React);
-    
     return () => {
       console.log("App component unmounted");
     };
