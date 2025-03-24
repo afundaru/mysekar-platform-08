@@ -8,9 +8,11 @@ import {
 import { DropdownWrapper } from '@/components/ui/dropdown-wrapper';
 import SignOutButton from './auth/SignOutButton';
 import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const DashboardHeader: React.FC = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   
   useEffect(() => {
     console.log("DashboardHeader rendering with user:", !!user);
@@ -21,7 +23,7 @@ const DashboardHeader: React.FC = () => {
   
   const handleProfileClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    window.location.href = '/profile';
+    navigate('/profile');
   };
   
   return (
@@ -56,7 +58,7 @@ const DashboardHeader: React.FC = () => {
           }
           align="end"
         >
-          <DropdownMenuItem onClick={() => window.location.href = '/profile'}>
+          <DropdownMenuItem onClick={() => navigate('/profile')}>
             Pengaturan Profil
           </DropdownMenuItem>
           <DropdownMenuSeparator />
