@@ -1,7 +1,9 @@
+
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { ArrowLeft, Edit } from 'lucide-react';
 import { Button } from "@/components/ui/button";
+import { useNavigate } from 'react-router-dom';
 import ProfileEditForm from './ProfileEditForm';
 import { toast } from 'sonner';
 import ProfileHeader from './ProfileHeader';
@@ -11,6 +13,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 const UserProfile: React.FC = () => {
   const { user, loading } = useAuth();
+  const navigate = useNavigate();
   
   const [editing, setEditing] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
@@ -24,10 +27,10 @@ const UserProfile: React.FC = () => {
     userEmail: user?.email || 'none'
   });
   
-  // Function to handle going back to dashboard using direct navigation
+  // Function to handle going back to dashboard using the navigation hook
   const handleGoBack = () => {
     console.log("Navigating back to dashboard");
-    window.location.href = '/dashboard';
+    navigate('/dashboard');
   };
   
   // Load avatar URL from user metadata on component mount
@@ -83,7 +86,7 @@ const UserProfile: React.FC = () => {
       <div className="w-full max-w-md mx-auto p-4">
         <div className="flex flex-col justify-center items-center h-48">
           <p className="text-gray-500 mb-4">Sesi tidak valid atau Anda belum login</p>
-          <Button onClick={() => window.location.href = '/login'} className="bg-teal hover:bg-teal-600">
+          <Button onClick={() => navigate('/login')} className="bg-teal hover:bg-teal-600">
             Login
           </Button>
         </div>
