@@ -18,7 +18,7 @@ if (!rootElement) {
 // Create root outside of render to help with debugging
 const root = ReactDOM.createRoot(rootElement);
 
-// Root React element with proper provider hierarchy
+// Root React element with provider hierarchy
 root.render(
   <React.StrictMode>
     <Router>

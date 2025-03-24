@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Bell, Settings } from 'lucide-react';
 import { 
   DropdownMenuItem,
@@ -11,6 +11,10 @@ import { useAuth } from '@/contexts/AuthContext';
 
 const DashboardHeader: React.FC = () => {
   const { user } = useAuth();
+  
+  useEffect(() => {
+    console.log("DashboardHeader rendering with user:", !!user);
+  }, [user]);
   
   // Get avatar URL from user metadata
   const avatarUrl = user?.user_metadata?.avatar_url || "https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-1.jpg";

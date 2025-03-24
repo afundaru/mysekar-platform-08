@@ -11,12 +11,7 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
-import { 
-  Tooltip, 
-  TooltipContent, 
-  TooltipProvider, 
-  TooltipTrigger 
-} from "@/components/ui/tooltip";
+import { TooltipWrapper } from "@/components/ui/tooltip-wrapper";
 
 interface ProfileAvatarProps {
   user: any;
