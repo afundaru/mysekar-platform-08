@@ -18,6 +18,7 @@ const DashboardBottomNavigation: React.FC = () => {
           <button 
             onClick={() => navigate('/dashboard')} 
             className={`flex flex-col items-center ${isActive('/dashboard')}`}
+            type="button"
           >
             <Home className="h-5 w-5" />
             <span className="text-xs mt-1">Beranda</span>
@@ -26,6 +27,7 @@ const DashboardBottomNavigation: React.FC = () => {
           <button 
             onClick={() => navigate('/pengaduan')} 
             className={`flex flex-col items-center ${isActive('/pengaduan')}`}
+            type="button"
           >
             <FileText className="h-5 w-5" />
             <span className="text-xs mt-1">Pengaduan</span>
@@ -34,6 +36,7 @@ const DashboardBottomNavigation: React.FC = () => {
           <button 
             onClick={() => navigate('/konsultasi')} 
             className={`flex flex-col items-center ${isActive('/konsultasi')}`}
+            type="button"
           >
             <MessageSquare className="h-5 w-5" />
             <span className="text-xs mt-1">Konsultasi</span>
@@ -42,6 +45,7 @@ const DashboardBottomNavigation: React.FC = () => {
           <button 
             onClick={() => navigate('/profile')} 
             className={`flex flex-col items-center ${isActive('/profile')}`}
+            type="button"
           >
             <User className="h-5 w-5" />
             <span className="text-xs mt-1">Profil</span>

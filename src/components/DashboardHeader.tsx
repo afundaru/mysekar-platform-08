@@ -28,7 +28,11 @@ const DashboardHeader: React.FC = () => {
   
   return (
     <header className="bg-white px-4 py-3 flex justify-between items-center shadow-sm">
-      <a href="/profile" className="flex items-center space-x-3">
+      {/* Left side with profile */}
+      <div 
+        className="flex items-center space-x-3 cursor-pointer" 
+        onClick={handleProfileClick}
+      >
         <div className="w-10 h-10 rounded-full bg-gray-300 overflow-hidden">
           <img 
             src={avatarUrl}
@@ -44,12 +48,16 @@ const DashboardHeader: React.FC = () => {
           <h2 className="text-sm font-semibold">{user?.email?.split('@')[0] || 'Pengguna'}</h2>
           <span className="text-xs text-teal">Anggota Aktif</span>
         </div>
-      </a>
+      </div>
+      
+      {/* Right side with notifications and settings */}
       <div className="flex items-center space-x-4">
         <button className="text-gray-600 relative">
           <Bell className="h-5 w-5" />
           <span className="absolute -top-1 -right-1 bg-red-500 w-2 h-2 rounded-full"></span>
         </button>
+        
+        {/* Settings dropdown */}
         <DropdownWrapper 
           trigger={
             <button className="focus:outline-none">
@@ -57,6 +65,7 @@ const DashboardHeader: React.FC = () => {
             </button>
           }
           align="end"
+          className="bg-white"
         >
           <DropdownMenuItem onClick={() => navigate('/profile')}>
             Pengaturan Profil
