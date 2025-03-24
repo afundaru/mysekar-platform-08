@@ -72,9 +72,9 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
       }
       
       try {
-        // Reduced timeout to prevent UI freezing (from 3000ms to 2000ms)
+        // Increased timeout from 2000ms to 5000ms for better reliability
         const timeoutPromise = new Promise<{data: null, error: Error}>((_, reject) => {
-          setTimeout(() => reject(new Error('Request timeout')), 2000);
+          setTimeout(() => reject(new Error('Request timeout')), 5000);
         });
         
         const fetchPromise = supabase

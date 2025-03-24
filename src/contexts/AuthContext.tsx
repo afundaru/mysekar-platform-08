@@ -44,8 +44,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (!user) return false;
     
     try {
+      // Increase timeout from 2 seconds to 5 seconds for better reliability
       const timeoutPromise = new Promise<{data: null, error: Error}>((_, reject) => {
-        setTimeout(() => reject(new Error('Request timeout')), 2000);
+        setTimeout(() => reject(new Error('Request timeout')), 5000);
       });
       
       const fetchPromise = supabase
