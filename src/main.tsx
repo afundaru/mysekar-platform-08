@@ -19,15 +19,15 @@ if (!rootElement) {
 // Create root outside of render to help with debugging
 const root = ReactDOM.createRoot(rootElement);
 
-// Fix provider order: Router must be the outermost provider for useNavigate to work
+// Root React element with proper provider hierarchy
+// React.StrictMode must wrap everything
+// Router must be outside TooltipProvider
 root.render(
   <React.StrictMode>
     <Router>
-      <TooltipProvider>
-        <AuthProvider>
-          <App />
-        </AuthProvider>
-      </TooltipProvider>
+      <AuthProvider>
+        <App />
+      </AuthProvider>
     </Router>
   </React.StrictMode>
 );
