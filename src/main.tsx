@@ -8,6 +8,11 @@ import { toast } from 'sonner';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { AuthProvider } from '@/contexts/AuthContext';
 
+// Add diagnostic logging for React
+console.log("main.tsx - React loaded:", !!React);
+console.log("main.tsx - React version:", React.version);
+console.log("main.tsx - useState available:", typeof React.useState === 'function');
+
 // Make sure we're using the correct element for mounting
 const rootElement = document.getElementById('root');
 
@@ -17,6 +22,9 @@ if (!rootElement) {
 
 // Create root outside of render to help with debugging
 const root = ReactDOM.createRoot(rootElement);
+
+// Add more diagnostic logging
+console.log("ReactDOM.createRoot successful");
 
 // Root React element with provider hierarchy
 root.render(
@@ -28,6 +36,8 @@ root.render(
     </Router>
   </React.StrictMode>
 );
+
+console.log("Root render called");
 
 // Register service worker for offline support
 serviceWorkerRegistration.register({
