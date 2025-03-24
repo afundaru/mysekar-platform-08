@@ -34,6 +34,7 @@ const HeroBanner: React.FC = () => {
         <Button 
           className="bg-teal hover:bg-teal/90 text-white px-6 py-2 md:px-8 md:py-3 rounded-full hover:bg-opacity-90 transition-all duration-300 shadow-md hover:shadow-lg animate-slide-up animate-delay-200 transform hover:-translate-y-1"
           onClick={handleRegisterClick}
+          type="button"
         >
           Gabung Sekarang
         </Button>

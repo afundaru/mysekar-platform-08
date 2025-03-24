@@ -20,7 +20,7 @@ function App() {
   
   return (
     <div className="App">
-      <Toaster />
+      <Toaster position="top-right" />
       <AppRoutes />
     </div>
   );

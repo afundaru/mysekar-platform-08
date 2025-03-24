@@ -26,7 +26,7 @@ export function DropdownWrapper({
       </DropdownMenuTrigger>
       <DropdownMenuContent 
         align={align} 
-        className={className} 
+        className={className || ""} 
         forceMount
       >
         {children}

@@ -26,7 +26,8 @@ const root = ReactDOM.createRoot(rootElement);
 // Add more diagnostic logging
 console.log("ReactDOM.createRoot successful");
 
-// Root React element with provider hierarchy - IMPORTANT: BrowserRouter must wrap AuthProvider
+// Root React element with provider hierarchy
+// IMPORTANT: BrowserRouter must wrap the entire app, including AuthProvider
 root.render(
   <React.StrictMode>
     <Router>
