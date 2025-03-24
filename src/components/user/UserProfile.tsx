@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { ArrowLeft, Edit } from 'lucide-react';
@@ -25,7 +24,7 @@ const UserProfile: React.FC = () => {
     userEmail: user?.email || 'none'
   });
   
-  // Function to handle going back to dashboard - using direct navigation instead of useNavigate
+  // Function to handle going back to dashboard using direct navigation
   const handleGoBack = () => {
     console.log("Navigating back to dashboard");
     window.location.href = '/dashboard';
@@ -61,7 +60,6 @@ const UserProfile: React.FC = () => {
     };
   }, []);
   
-  // Separate the rendering logic based on state
   if (loading || isPageLoading) {
     return (
       <div className="w-full max-w-md mx-auto p-4">
