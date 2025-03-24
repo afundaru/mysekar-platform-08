@@ -26,7 +26,9 @@ root.render(
   <React.StrictMode>
     <Router>
       <AuthProvider>
-        <App />
+        <TooltipProvider>
+          <App />
+        </TooltipProvider>
       </AuthProvider>
     </Router>
   </React.StrictMode>
