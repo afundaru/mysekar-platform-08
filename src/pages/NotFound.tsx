@@ -13,6 +13,10 @@ const NotFound = () => {
         <p className="text-gray-600 mb-8">Maaf, halaman yang Anda cari tidak tersedia atau telah dipindahkan.</p>
         <a 
           href="/" 
+          onClick={(e) => {
+            e.preventDefault();
+            window.location.href = '/';
+          }}
           className="inline-flex items-center justify-center bg-teal text-white px-6 py-3 rounded-full hover:bg-opacity-90 transition-all duration-300 transform hover:-translate-y-1"
         >
           <Home size={18} className="mr-2" />

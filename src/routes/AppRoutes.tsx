@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Index from '@/pages/Index';
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
@@ -72,6 +72,7 @@ const AppRoutes = () => {
           <AdminApp />
         </AdminRoute>
       } />
+      {/* Make sure 404 is the last route */}
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
