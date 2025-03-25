@@ -1,6 +1,5 @@
 
 import * as React from 'react';
-import { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -19,7 +18,7 @@ interface AuthContextType {
 }
 
 // Create context with default values
-const AuthContext = createContext<AuthContextType>({
+const AuthContext = React.createContext<AuthContextType>({
   session: null,
   user: null,
   loading: true,
@@ -35,15 +34,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   console.log("AuthProvider rendering");
   
   // Initialize useState hooks properly
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [userRole, setUserRole] = useState<AppRole | null>(null);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+  const [user, setUser] = React.useState<User | null>(null);
+  const [session, setSession] = React.useState<Session | null>(null);
+  const [loading, setLoading] = React.useState(true);
+  const [userRole, setUserRole] = React.useState<AppRole | null>(null);
+  const [isAdmin, setIsAdmin] = React.useState(false);
+  const [error, setError] = React.useState<Error | null>(null);
 
   // Optimized checkIsAdmin function to leverage the new database indexes
-  const checkIsAdmin = useCallback(async (): Promise<boolean> => {
+  const checkIsAdmin = React.useCallback(async (): Promise<boolean> => {
     if (!user) return false;
     
     try {
@@ -102,7 +101,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [user, isAdmin]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     let mounted = true; // Flag to track if component is mounted
     
     const setupAuth = async () => {
@@ -203,11 +202,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const isValidEmail = useCallback((email: string): boolean => {
+  const isValidEmail = React.useCallback((email: string): boolean => {
     return email.endsWith('@bankraya.co.id');
   }, []);
 
-  const contextValue = useMemo(() => ({
+  const contextValue = React.useMemo(() => ({
     session,
     user,
     loading,
@@ -248,7 +247,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 };
 
 export const useAuth = () => {
-  const context = useContext(AuthContext);
+  const context = React.useContext(AuthContext);
   if (!context) {
     console.error("useAuth must be used within an AuthProvider");
     throw new Error('useAuth must be used within an AuthProvider');

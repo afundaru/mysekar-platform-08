@@ -3,15 +3,6 @@ import React from "react";
 import { Home } from "lucide-react";
 
 const NotFound = () => {
-  // Remove useLocation hook since it's causing issues outside Router context
-  
-  React.useEffect(() => {
-    // Log the error without depending on useLocation
-    console.error(
-      "404 Error: User attempted to access non-existent route"
-    );
-  }, []);
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
       <div className="text-center glass-card p-8 rounded-2xl max-w-md w-full animate-fade-in">
