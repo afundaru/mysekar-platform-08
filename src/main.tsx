@@ -5,7 +5,7 @@ import App from './App.tsx'
 import './index.css'
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import { toast } from 'sonner';
-import { BrowserRouter as Router } from 'react-router-dom';
+import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from '@/contexts/AuthContext';
 
 // Add diagnostic logging for React
@@ -30,11 +30,11 @@ console.log("ReactDOM.createRoot successful");
 // IMPORTANT: BrowserRouter must wrap the entire app, including AuthProvider
 root.render(
   <React.StrictMode>
-    <Router>
+    <BrowserRouter>
       <AuthProvider>
         <App />
       </AuthProvider>
-    </Router>
+    </BrowserRouter>
   </React.StrictMode>
 );
 
