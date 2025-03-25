@@ -1,3 +1,4 @@
+
 import * as React from 'react';
 import { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import { Session, User } from '@supabase/supabase-js';
@@ -30,7 +31,7 @@ const AuthContext = createContext<AuthContextType>({
 });
 
 // Export the AuthProvider component
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   console.log("AuthProvider rendering");
   
   // Initialize useState hooks properly
