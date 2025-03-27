@@ -29,7 +29,7 @@ const ErrorFallback = ({ error, resetErrorBoundary }: { error: Error; resetError
 
 // Loading fallback
 const LoadingFallback = () => (
-  <div className="p-4 space-y-6">
+  <div className="p-4 space-y-6" aria-label="Loading profile content">
     <Skeleton className="h-24 w-full rounded-md" />
     <Skeleton className="h-48 w-full rounded-md" />
     <Skeleton className="h-48 w-full rounded-md" />
@@ -37,20 +37,25 @@ const LoadingFallback = () => (
 );
 
 const Profile = () => {
-  const auth = useAuth();
+  const { user, loading } = useAuth();
   
   useEffect(() => {
     console.log("Profile page mounted, auth state:", {
-      hasUser: !!auth.user,
-      isLoading: auth.loading,
-      userEmail: auth.user?.email || 'none'
+      hasUser: !!user,
+      isLoading: loading,
+      userEmail: user?.email || 'none'
     });
-  }, [auth.user, auth.loading]);
+  }, [user, loading]);
   
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Status Bar */}
-      <div className="bg-teal h-6"></div>
+      {/* Status Bar with context */}
+      <div className="bg-teal h-6 flex items-center justify-between px-4">
+        <span className="text-xs text-white font-medium" role="status">{user ? 'Profil Pengguna' : 'Memuat...'}</span>
+        <span className="text-xs text-white" role="status">
+          {new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
+        </span>
+      </div>
       
       {/* Header */}
       <ErrorBoundary FallbackComponent={ErrorFallback}>
@@ -58,7 +63,7 @@ const Profile = () => {
       </ErrorBoundary>
       
       {/* Main Content */}
-      <main className="p-4 pb-20">
+      <main className="p-4 pb-20" role="main" aria-label="User Profile">
         <ErrorBoundary 
           FallbackComponent={ErrorFallback}
           onReset={() => window.location.reload()}
