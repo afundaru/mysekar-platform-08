@@ -27,7 +27,7 @@ const UserProfile: React.FC = () => {
     userEmail: user?.email || 'none'
   });
   
-  // Function to handle going back to dashboard using the navigation hook
+  // Function to handle going back to dashboard
   const handleGoBack = () => {
     console.log("Navigating back to dashboard");
     navigate('/dashboard');
