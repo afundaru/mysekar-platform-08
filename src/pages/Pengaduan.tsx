@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { AlertCircle, Loader2 } from 'lucide-react';
+import { AlertCircle, Loader2, WifiOff } from 'lucide-react';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import PengaduanHeader from '@/components/pengaduan/PengaduanHeader';
@@ -30,13 +30,37 @@ const Pengaduan: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [currentView, setCurrentView] = useState<'list' | 'form' | 'history'>('list');
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isOffline, setIsOffline] = useState(!navigator.onLine);
   const navigate = useNavigate();
 
+  // Monitor online status
   useEffect(() => {
-    fetchComplaints();
+    const handleOnline = () => setIsOffline(false);
+    const handleOffline = () => setIsOffline(true);
+    
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
   }, []);
 
+  useEffect(() => {
+    if (!isOffline) {
+      fetchComplaints();
+    }
+  }, [isOffline]);
+
   const fetchComplaints = async () => {
+    // If offline, don't try to fetch
+    if (isOffline) {
+      setError('Anda sedang offline. Silakan periksa koneksi internet Anda.');
+      setIsLoading(false);
+      return;
+    }
+    
     // If we're refreshing, don't show the full loading state again
     if (!isRefreshing) {
       setIsLoading(true);
@@ -66,27 +90,36 @@ const Pengaduan: React.FC = () => {
         setTimeout(() => reject(new Error('Waktu permintaan habis. Periksa koneksi internet Anda.')), 15000)
       );
       
-      const fetchPromise = supabase
-        .from('complaints')
-        .select('*')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false });
-      
-      // Use Promise.race to implement a timeout
-      const { data, error: complaintsError } = await Promise.race([
-        fetchPromise,
-        timeoutPromise.then(() => { throw new Error('Network timeout'); })
-      ]) as any;
-      
-      if (complaintsError) {
-        console.error('Error fetching complaints:', complaintsError);
-        throw complaintsError;
+      try {
+        const { data, error: complaintsError } = await Promise.race([
+          supabase
+            .from('complaints')
+            .select('*')
+            .eq('user_id', userId)
+            .order('created_at', { ascending: false }),
+          timeoutPromise
+        ]) as any;
+        
+        if (complaintsError) {
+          console.error('Error fetching complaints:', complaintsError);
+          throw complaintsError;
+        }
+        
+        setComplaints(data || []);
+      } catch (fetchError: any) {
+        // If this is a network error, mark as offline
+        if (fetchError.message?.includes('Failed to fetch') || 
+            fetchError.message?.includes('NetworkError') ||
+            fetchError.message?.includes('Network request failed') || 
+            fetchError.message?.includes('Network timeout')) {
+          setIsOffline(true);
+          throw new Error('Tidak dapat terhubung ke server. Periksa koneksi internet Anda.');
+        }
+        throw fetchError;
       }
-      
-      setComplaints(data || []);
     } catch (err: any) {
       console.error('Error fetching complaints:', err);
-      setError('Gagal memuat data pengaduan. Silakan coba lagi nanti.');
+      setError(err?.message || 'Gagal memuat data pengaduan. Silakan coba lagi nanti.');
       toast.error('Gagal memuat data pengaduan');
     } finally {
       setIsLoading(false);
@@ -113,6 +146,30 @@ const Pengaduan: React.FC = () => {
   };
 
   const renderContent = () => {
+    if (isOffline && currentView === 'list') {
+      return (
+        <div className="p-4">
+          <Card className="p-6 mb-4 bg-amber-50 border-amber-200">
+            <div className="flex flex-col items-center text-center">
+              <WifiOff className="h-10 w-10 text-amber-500 mb-2" />
+              <h3 className="text-lg font-semibold text-amber-700 mb-1">Mode Offline</h3>
+              <p className="text-amber-600 mb-4">Anda sedang offline. Beberapa fitur mungkin tidak tersedia.</p>
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  setIsOffline(false);
+                  fetchComplaints();
+                }}
+                className="w-full md:w-auto"
+              >
+                Coba Lagi
+              </Button>
+            </div>
+          </Card>
+        </div>
+      );
+    }
+    
     if (currentView === 'list') {
       return (
         <>
@@ -142,7 +199,7 @@ const Pengaduan: React.FC = () => {
                       fetchComplaints();
                     }}
                     className="w-full md:w-auto"
-                    disabled={isRefreshing}
+                    disabled={isRefreshing || isOffline}
                   >
                     {isRefreshing ? (
                       <>
@@ -160,19 +217,42 @@ const Pengaduan: React.FC = () => {
               isLoading={isLoading}
               loadError={error}
               onRetry={fetchComplaints}
+              isOffline={isOffline}
             />
           )}
         </>
       );
     } else if (currentView === 'form') {
-      return <ComplaintSubmissionForm onSubmitSuccess={handleComplaintSubmitted} />;
+      return (
+        isOffline ? (
+          <div className="p-4">
+            <Card className="p-6 mb-4 bg-amber-50 border-amber-200">
+              <div className="flex flex-col items-center text-center">
+                <WifiOff className="h-10 w-10 text-amber-500 mb-2" />
+                <h3 className="text-lg font-semibold text-amber-700 mb-1">Tidak Dapat Mengirim Pengaduan</h3>
+                <p className="text-amber-600 mb-4">Anda sedang offline. Silakan coba lagi ketika terhubung ke internet.</p>
+                <Button 
+                  variant="outline" 
+                  onClick={handleBack}
+                  className="w-full md:w-auto"
+                >
+                  Kembali
+                </Button>
+              </div>
+            </Card>
+          </div>
+        ) : (
+          <ComplaintSubmissionForm onSubmitSuccess={handleComplaintSubmitted} />
+        )
+      );
     } else {
       return (
         <ComplaintHistory 
           complaints={complaints} 
           isLoading={isLoading} 
           error={error} 
-          onRetry={fetchComplaints} 
+          onRetry={fetchComplaints}
+          isOffline={isOffline} 
         />
       );
     }

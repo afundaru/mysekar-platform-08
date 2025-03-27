@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Loader2, AlertCircle, RefreshCw } from 'lucide-react';
+import { Loader2, AlertCircle, RefreshCw, WifiOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -10,13 +10,15 @@ interface ComplaintHistoryProps {
   isLoading: boolean;
   error: string | null;
   onRetry: () => void;
+  isOffline?: boolean;
 }
 
 const ComplaintHistory: React.FC<ComplaintHistoryProps> = ({ 
   complaints, 
   isLoading, 
   error,
-  onRetry 
+  onRetry,
+  isOffline = false
 }) => {
   if (isLoading) {
     return (
@@ -25,6 +27,26 @@ const ComplaintHistory: React.FC<ComplaintHistoryProps> = ({
         <Skeleton className="h-20 w-full mb-3" />
         <Skeleton className="h-20 w-full mb-3" />
         <Skeleton className="h-20 w-full" />
+      </div>
+    );
+  }
+
+  if (isOffline) {
+    return (
+      <div className="p-4">
+        <Card className="p-6 text-center">
+          <WifiOff className="h-10 w-10 text-amber-500 mx-auto mb-3" />
+          <p className="text-amber-700 font-medium mb-2">Anda sedang offline</p>
+          <p className="text-gray-600 mb-4">Tidak dapat memuat data riwayat. Periksa koneksi internet Anda.</p>
+          <Button 
+            variant="outline"
+            onClick={onRetry}
+            className="mx-auto flex items-center gap-2"
+          >
+            <RefreshCw className="h-4 w-4" />
+            Coba Lagi
+          </Button>
+        </Card>
       </div>
     );
   }

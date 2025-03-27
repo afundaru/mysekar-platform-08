@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Loader2, RefreshCw, AlertCircle } from 'lucide-react';
+import { Loader2, RefreshCw, AlertCircle, WifiOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
@@ -19,13 +19,15 @@ interface ComplaintsListProps {
   isLoading?: boolean;
   loadError?: string | null;
   onRetry?: () => void;
+  isOffline?: boolean;
 }
 
 const ComplaintsList: React.FC<ComplaintsListProps> = ({
   complaints,
   isLoading = false,
   loadError = null,
-  onRetry = () => {}
+  onRetry = () => {},
+  isOffline = false
 }) => {
   const formatDate = (dateString: string) => {
     try {
@@ -50,6 +52,29 @@ const ComplaintsList: React.FC<ComplaintsListProps> = ({
         <Skeleton className="h-20 w-full mb-3" />
         <Skeleton className="h-20 w-full mb-3" />
         <Skeleton className="h-20 w-full" />
+      </div>
+    );
+  }
+
+  if (isOffline) {
+    return (
+      <div className="p-4">
+        <div className="flex justify-between items-center mb-2">
+          <h2 className="font-semibold text-lg">Riwayat Pengaduan</h2>
+        </div>
+        <Card className="p-6 text-center">
+          <WifiOff className="h-10 w-10 text-amber-500 mx-auto mb-3" />
+          <p className="text-amber-700 font-medium mb-2">Anda sedang offline</p>
+          <p className="text-gray-600 mb-4">Tidak dapat memuat data pengaduan. Periksa koneksi internet Anda.</p>
+          <Button 
+            variant="outline"
+            onClick={onRetry}
+            className="mx-auto flex items-center gap-2"
+          >
+            <RefreshCw className="h-4 w-4" />
+            Coba Lagi
+          </Button>
+        </Card>
       </div>
     );
   }
