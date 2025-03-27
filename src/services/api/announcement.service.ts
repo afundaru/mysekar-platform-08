@@ -27,7 +27,7 @@ export const announcementService = {
     try {
       const { data, error } = await supabase
         .from('announcements')
-        .select('id, title, date, image_url, description')
+        .select('id, title, date, image_url, description, created_at')
         .order('date', { ascending: false })
         .limit(limit);
       

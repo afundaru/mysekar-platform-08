@@ -72,7 +72,7 @@ export const complaintsService = {
   /**
    * Submit a new complaint
    */
-  async submitComplaint(complaintData: ComplaintSubmission, file?: File | null): Promise<{ success: boolean; error: Error | null; complaintId?: string }> {
+  async submitComplaint(submission: ComplaintSubmission, file?: File | null): Promise<{ success: boolean; error: Error | null; complaintId?: string }> {
     try {
       // Get user ID from session
       const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
@@ -87,14 +87,14 @@ export const complaintsService = {
       }
 
       // Insert complaint record
-      const { data: complaintData, error: complaintError } = await supabase
+      const { data: insertedData, error: complaintError } = await supabase
         .from('complaints')
         .insert({
           user_id: userId,
-          title: complaintData.title,
-          description: complaintData.description,
-          category: complaintData.category,
-          is_anonymous: complaintData.is_anonymous,
+          title: submission.title,
+          description: submission.description,
+          category: submission.category,
+          is_anonymous: submission.is_anonymous,
           status: 'pending' // Default status for new complaints
         })
         .select('id')
@@ -106,9 +106,9 @@ export const complaintsService = {
       }
 
       // Upload file if provided
-      if (file && complaintData?.id) {
+      if (file && insertedData?.id) {
         const fileExt = file.name.split('.').pop();
-        const filePath = `${userId}/${complaintData.id}/${Math.random().toString(36).substring(2)}.${fileExt}`;
+        const filePath = `${userId}/${insertedData.id}/${Math.random().toString(36).substring(2)}.${fileExt}`;
         
         const { error: uploadError } = await supabase.storage
           .from('complaint_attachments')
@@ -123,7 +123,7 @@ export const complaintsService = {
           const { error: attachmentError } = await supabase
             .from('complaint_attachments')
             .insert({
-              complaint_id: complaintData.id,
+              complaint_id: insertedData.id,
               file_path: filePath,
               file_name: file.name,
               file_type: file.type,
@@ -136,7 +136,7 @@ export const complaintsService = {
         }
       }
 
-      return { success: true, error: null, complaintId: complaintData?.id };
+      return { success: true, error: null, complaintId: insertedData?.id };
     } catch (err: any) {
       console.error('Error submitting complaint:', err);
       return { success: false, error: err };
