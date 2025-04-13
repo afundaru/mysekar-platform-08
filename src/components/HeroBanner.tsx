@@ -3,7 +3,6 @@ import * as React from 'react';
 
 const HeroBanner: React.FC = () => {
   const handleButtonClick = () => {
-    // Instead of navigation, just log for now
     console.log('Join button clicked');
   };
 
@@ -11,8 +10,8 @@ const HeroBanner: React.FC = () => {
     <section className="relative h-[280px] overflow-hidden animate-fade-in">
       <img 
         className="w-full h-full object-cover transform scale-100 hover:scale-105 transition-transform duration-700 ease-in-out" 
-        src="https://storage.googleapis.com/uxpilot-auth.appspot.com/e9f4ab2317-f40300d887c84ad76d24.png" 
-        alt="Modern illustration of labor union workers" 
+        src="https://images.unsplash.com/photo-1519389950473-47ba0277781c" 
+        alt="Tim profesional perbankan bekerja bersama" 
       />
       <div className="absolute inset-0 hero-gradient"></div>
       <div className="absolute bottom-0 left-0 p-6 text-white">
