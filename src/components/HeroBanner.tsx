@@ -10,8 +10,8 @@ const HeroBanner: React.FC = () => {
     <section className="relative h-[280px] overflow-hidden animate-fade-in">
       <img 
         className="w-full h-full object-cover transform scale-100 hover:scale-105 transition-transform duration-700 ease-in-out" 
-        src="https://images.unsplash.com/photo-1506755855567-92ff770e8d00" 
-        alt="Solidaritas pekerja kantoran dengan tangan terangkat" 
+        src="/lovable-uploads/b072f082-c7c7-4c53-8af4-803f834650b5.png" 
+        alt="Solidaritas pekerja kantoran dalam demonstrasi" 
       />
       <div className="absolute inset-0 hero-gradient"></div>
       <div className="absolute bottom-0 left-0 p-6 text-white">
