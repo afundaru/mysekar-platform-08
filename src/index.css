@@ -106,7 +106,7 @@
   }
   
   .hero-gradient {
-    @apply bg-gradient-to-t from-black/80 via-black/60 to-light-teal/30;
+    @apply bg-gradient-to-t from-black/60 to-transparent;
   }
   
   .animate-delay-100 {
@@ -128,72 +128,4 @@
   .animate-delay-500 {
     animation-delay: 500ms;
   }
-}
-
-/* Custom color classes */
-.text-teal {
-  color: #008080;
-}
-
-.bg-teal {
-  background-color: #008080;
-}
-
-.hover\:bg-teal:hover {
-  background-color: #008080;
-}
-
-.border-teal {
-  border-color: #008080;
-}
-
-.ring-teal {
-  --tw-ring-color: #008080;
-}
-
-.focus\:border-teal:focus {
-  border-color: #008080;
-}
-
-.focus\:ring-teal:focus {
-  --tw-ring-color: #008080;
-}
-
-/* Light Teal color */
-.text-light-teal {
-  color: #88D8C0;
-}
-
-.bg-light-teal {
-  background-color: #88D8C0;
-}
-
-.hover\:bg-light-teal:hover {
-  background-color: #88D8C0;
-}
-
-.border-light-teal {
-  border-color: #88D8C0;
-}
-
-/* Red flag color */
-.text-flag-red {
-  color: #D32F2F;
-}
-
-.bg-flag-red {
-  background-color: #D32F2F;
-}
-
-.hover\:bg-flag-red:hover {
-  background-color: #B71C1C;
-}
-
-/* Union yellow background color - replaced with light teal */
-.bg-union-yellow {
-  background-color: #88D8C0;
-}
-
-.text-union-yellow {
-  color: #88D8C0;
 }

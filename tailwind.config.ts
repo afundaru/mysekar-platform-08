@@ -69,9 +69,6 @@ export default {
 				teal: {
 					DEFAULT: '#008080',
 				},
-				'light-teal': {
-					DEFAULT: '#88D8C0',
-				},
 				'primary-blue': {
 					DEFAULT: '#00AEEF',
 				}

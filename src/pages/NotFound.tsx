@@ -1,8 +1,18 @@
 
-import React from "react";
+import { useLocation } from "react-router-dom";
+import { useEffect } from "react";
 import { Home } from "lucide-react";
 
 const NotFound = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    console.error(
+      "404 Error: User attempted to access non-existent route:",
+      location.pathname
+    );
+  }, [location.pathname]);
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
       <div className="text-center glass-card p-8 rounded-2xl max-w-md w-full animate-fade-in">
@@ -11,13 +21,13 @@ const NotFound = () => {
         </div>
         <h1 className="text-2xl font-bold mb-4">Halaman Tidak Ditemukan</h1>
         <p className="text-gray-600 mb-8">Maaf, halaman yang Anda cari tidak tersedia atau telah dipindahkan.</p>
-        <button 
-          onClick={() => window.location.href = '/'}
+        <a 
+          href="/" 
           className="inline-flex items-center justify-center bg-teal text-white px-6 py-3 rounded-full hover:bg-opacity-90 transition-all duration-300 transform hover:-translate-y-1"
         >
           <Home size={18} className="mr-2" />
           Kembali ke Beranda
-        </button>
+        </a>
       </div>
     </div>
   );

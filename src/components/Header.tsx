@@ -9,10 +9,10 @@ const Header: React.FC = () => {
         <h1 className="text-xl font-bold text-teal">MySEKAR</h1>
       </div>
       <div className="flex items-center space-x-4">
-        <button type="button" className="text-gray-600 hover:text-teal transition-colors duration-200">
+        <button className="text-gray-600 hover:text-teal transition-colors duration-200">
           <Bell size={20} />
         </button>
-        <button type="button" className="text-gray-600 hover:text-teal transition-colors duration-200">
+        <button className="text-gray-600 hover:text-teal transition-colors duration-200">
           <User size={20} />
         </button>
       </div>
