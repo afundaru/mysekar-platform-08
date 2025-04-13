@@ -19,7 +19,7 @@ const HeroBanner: React.FC = () => {
         <p className="text-sm mb-4 animate-slide-up animate-delay-100">Platform digital terpadu untuk anggota serikat pekerja</p>
         <button 
           onClick={handleButtonClick}
-          className="bg-primary-blue text-white px-6 py-2 rounded-full hover:bg-opacity-90 transition-all duration-300 shadow-md hover:shadow-lg animate-slide-up animate-delay-200 transform hover:-translate-y-1">
+          className="sekar-button-primary animate-slide-up animate-delay-200 transform hover:-translate-y-1">
           Gabung Sekarang
         </button>
       </div>

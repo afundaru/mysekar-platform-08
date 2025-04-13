@@ -18,9 +18,9 @@ const Index: React.FC = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-bg-dark">
       {/* Status Bar - Fixed at the top */}
-      <div className="bg-teal h-6"></div>
+      <div className="bg-primary h-6"></div>
       
       {/* Header */}
       <Header />

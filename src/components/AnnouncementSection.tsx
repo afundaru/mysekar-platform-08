@@ -10,17 +10,17 @@ interface AnnouncementProps {
 
 const AnnouncementCard: React.FC<AnnouncementProps> = ({ image, title, date }) => {
   return (
-    <div className="flex-none w-64 bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 animate-slide-up">
+    <div className="flex-none w-64 sekar-card overflow-hidden hover:shadow-lg transition-shadow duration-300 animate-slide-up">
       <div className="overflow-hidden">
         <img 
-          className="w-full h-32 object-cover rounded-t-lg transform scale-100 hover:scale-105 transition-transform duration-500 ease-in-out" 
+          className="w-full h-32 object-cover rounded-t-2xl transform scale-100 hover:scale-105 transition-transform duration-500 ease-in-out" 
           src={image} 
           alt={title} 
         />
       </div>
       <div className="p-3">
         <h3 className="text-sm font-medium">{title}</h3>
-        <p className="text-xs text-gray-500 mt-1">{date}</p>
+        <p className="text-xs text-text-secondary mt-1">{date}</p>
       </div>
     </div>
   );
@@ -49,7 +49,7 @@ const AnnouncementSection: React.FC = () => {
     <section className="px-4 py-6 animate-fade-in">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-semibold">Pengumuman & Berita</h2>
-        <button className="text-teal text-sm flex items-center hover:underline transition-all duration-200">
+        <button className="text-accent text-sm flex items-center hover:underline transition-all duration-200">
           Lihat Semua
           <ChevronRight size={16} className="ml-1" />
         </button>

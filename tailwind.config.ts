@@ -20,7 +20,8 @@ export default {
 		},
 		extend: {
 			fontFamily: {
-				sans: ['Inter', 'sans-serif'],
+				sans: ['Roboto', 'sans-serif'],
+				montserrat: ['Montserrat', 'sans-serif'],
 			},
 			colors: {
 				border: 'hsl(var(--border))',
@@ -29,12 +30,18 @@ export default {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				primary: {
-					DEFAULT: 'hsl(var(--primary))',
-					foreground: 'hsl(var(--primary-foreground))'
+					DEFAULT: '#D32F2F',
+					foreground: '#FFFFFF',
+					hover: '#B71C1C',
 				},
 				secondary: {
-					DEFAULT: 'hsl(var(--secondary))',
-					foreground: 'hsl(var(--secondary-foreground))'
+					DEFAULT: '#1C1C1C',
+					foreground: '#FFFFFF'
+				},
+				accent: {
+					DEFAULT: '#FF5252',
+					foreground: '#FFFFFF',
+					hover: '#FFEBEE'
 				},
 				destructive: {
 					DEFAULT: 'hsl(var(--destructive))',
@@ -42,7 +49,7 @@ export default {
 				},
 				muted: {
 					DEFAULT: 'hsl(var(--muted))',
-					foreground: 'hsl(var(--muted-foreground))'
+					foreground: '#BDBDBD'
 				},
 				accent: {
 					DEFAULT: 'hsl(var(--accent))',
@@ -53,8 +60,8 @@ export default {
 					foreground: 'hsl(var(--popover-foreground))'
 				},
 				card: {
-					DEFAULT: 'hsl(var(--card))',
-					foreground: 'hsl(var(--card-foreground))'
+					DEFAULT: '#1C1C1C',
+					foreground: '#FFFFFF'
 				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
@@ -71,7 +78,15 @@ export default {
 				},
 				'primary-blue': {
 					DEFAULT: '#00AEEF',
-				}
+				},
+				// MySEKAR colors
+				'bg-dark': '#2B2B2B',
+				'bg-light': '#F5F5F5',
+				'text-secondary': '#BDBDBD',
+				'input-bg': '#3A3A3C',
+				'success': '#4CAF50',
+				'warning': '#FFB300',
+				'error': '#B00020',
 			},
 			borderRadius: {
 				lg: 'var(--radius)',

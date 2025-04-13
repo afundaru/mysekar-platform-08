@@ -9,9 +9,9 @@ interface StatItemProps {
 
 const StatItem: React.FC<StatItemProps> = ({ value, label, delay }) => {
   return (
-    <div className={`bg-white p-3 rounded-lg shadow-md text-center animate-slide-up ${delay}`}>
-      <div className="text-teal text-xl font-bold">{value}</div>
-      <div className="text-xs text-gray-500">{label}</div>
+    <div className={`sekar-card text-center animate-slide-up ${delay}`}>
+      <div className="text-primary text-xl font-bold">{value}</div>
+      <div className="text-xs text-text-secondary">{label}</div>
     </div>
   );
 };

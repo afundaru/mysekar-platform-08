@@ -10,17 +10,17 @@ interface QuickAccessItemProps {
 
 const QuickAccessItem: React.FC<QuickAccessItemProps> = ({ icon, title, description }) => {
   return (
-    <div className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 animate-slide-up">
-      <div className="text-teal mb-2">{icon}</div>
+    <div className="sekar-card hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 animate-slide-up">
+      <div className="text-primary mb-2">{icon}</div>
       <h3 className="text-sm font-medium">{title}</h3>
-      <p className="text-xs text-gray-500 mt-1">{description}</p>
+      <p className="text-xs text-text-secondary mt-1">{description}</p>
     </div>
   );
 };
 
 const QuickAccess: React.FC = () => {
   return (
-    <section className="px-4 py-6 bg-gray-50 animate-fade-in">
+    <section className="px-4 py-6 bg-bg-dark animate-fade-in">
       <h2 className="text-lg font-semibold mb-4">Akses Cepat</h2>
       <div className="grid grid-cols-2 gap-4">
         <QuickAccessItem 
