@@ -1,7 +1,12 @@
 
-import React from 'react';
+import * as React from 'react';
 
 const HeroBanner: React.FC = () => {
+  const handleButtonClick = () => {
+    // Instead of navigation, just log for now
+    console.log('Join button clicked');
+  };
+
   return (
     <section className="relative h-[280px] overflow-hidden animate-fade-in">
       <img 
@@ -13,7 +18,9 @@ const HeroBanner: React.FC = () => {
       <div className="absolute bottom-0 left-0 p-6 text-white">
         <h1 className="text-2xl font-bold mb-2 animate-slide-up">Salam Solidaritas!</h1>
         <p className="text-sm mb-4 animate-slide-up animate-delay-100">Platform digital terpadu untuk anggota serikat pekerja</p>
-        <button className="bg-primary-blue text-white px-6 py-2 rounded-full hover:bg-opacity-90 transition-all duration-300 shadow-md hover:shadow-lg animate-slide-up animate-delay-200 transform hover:-translate-y-1">
+        <button 
+          onClick={handleButtonClick}
+          className="bg-primary-blue text-white px-6 py-2 rounded-full hover:bg-opacity-90 transition-all duration-300 shadow-md hover:shadow-lg animate-slide-up animate-delay-200 transform hover:-translate-y-1">
           Gabung Sekarang
         </button>
       </div>
