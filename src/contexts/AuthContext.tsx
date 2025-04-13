@@ -1,7 +1,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Session, User } from '@supabase/supabase-js';
+import { Session, User, AuthError } from '@supabase/supabase-js';
 import { useToast } from '@/components/ui/use-toast';
 
 type AuthContextType = {
@@ -9,12 +9,12 @@ type AuthContextType = {
   session: Session | null;
   isLoading: boolean;
   signIn: (email: string, password: string) => Promise<{
-    error: Error | null;
-    data: Session | null;
+    error: AuthError | null;
+    data: { session: Session | null };
   }>;
   signUp: (email: string, password: string, phone: string, pnNumber: string, fullName: string) => Promise<{
-    error: Error | null;
-    data: Session | null;
+    error: AuthError | null;
+    data: { session: Session | null };
   }>;
   signOut: () => Promise<void>;
 };
@@ -65,7 +65,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsLoading(true);
     const response = await supabase.auth.signInWithPassword({ email, password });
     setIsLoading(false);
-    return response;
+    return {
+      error: response.error,
+      data: { session: response.data.session }
+    };
   };
 
   const signUp = async (
@@ -88,7 +91,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     });
     setIsLoading(false);
-    return response;
+    return {
+      error: response.error,
+      data: { session: response.data.session }
+    };
   };
 
   const signOut = async () => {

@@ -1,5 +1,5 @@
 
-import React from 'react';
+import * as React from 'react';
 import { Bell, User } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
