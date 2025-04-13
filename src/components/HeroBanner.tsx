@@ -16,7 +16,7 @@ const HeroBanner: React.FC = () => {
       <div className="absolute inset-0 hero-gradient"></div>
       <div className="absolute bottom-0 left-0 p-6 text-white">
         <h1 className="text-2xl font-bold mb-2 animate-slide-up">Salam Solidaritas!</h1>
-        <p className="text-sm mb-4 animate-slide-up animate-delay-100">Platform digital terpadu untuk anggota serikat pekerja</p>
+        <p className="text-sm mb-4 animate-slide-up animate-delay-100">Platform Digital untuk Anggota Serikat Pekerja Bank Raya</p>
         <button 
           onClick={handleButtonClick}
           className="sekar-button-primary animate-slide-up animate-delay-200 transform hover:-translate-y-1">
